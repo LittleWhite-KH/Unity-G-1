@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ThreeLayerNativeSlider : MonoBehaviour
 {
     [Header("原生Slider引用")]
     public Slider slider;
     public Image hintRangeImage;
-    public Image bonusChargeImage;      //⭐第四层：充能条
+    public Image bonusChargeImage;
 
     [Header("数值配置")]
     public float totalMax = 100f;
@@ -14,43 +15,56 @@ public class ThreeLayerNativeSlider : MonoBehaviour
     public float levelMaxValue = 80f;
 
     [Header("第四层充能设置")]
-    public float bonusStartThreshold = 75f;  //大于等于75开始充能
-    public float bonusFullValue = 80f;      //充能目标上限
-    public float bonusChargeSpeed = 12f;    //充能增长速度
-    [Tooltip("离开高能区间是否重置充能")]
-    public bool resetBonusWhenLeave = false;
+    public float bonusStartThreshold = 75f;
+    public float bonusFullValue = 80f;
+    public float bonusChargeSpeed = 12f;
+    public float bonusDecaySpeed = 5f;
 
     [Header("视角检测")]
     public Transform playerTransform;
-    public Transform targetObject;
+    public Transform targetObject;   // 当前目标（由外部动态赋值）
+
+    [Header("距离条件")]
+    public float chargeDistanceThreshold = 10f;   // 距离≤10才能充能
 
     [Header("平滑过渡")]
     public float smoothSpeed = 6f;
     private float smoothValue;
 
+    [Header("数值显示")]
+    public TextMeshProUGUI displayText;
+
     private RectTransform fillAreaRt;
     private RectTransform hintRt;
     private RectTransform bonusRt;
+    private float bonusCurrent;
 
-    private float bonusCurrent; //第四层当前充能数值
+    // 公共属性
+    public float BonusCurrent => bonusCurrent;
+    public bool IsBonusFull => bonusCurrent >= bonusFullValue - 0.01f;
+    public float BonusWidth => bonusRt != null ? bonusRt.sizeDelta.x : 0f;
+
+    // 重置充能
+    public void ResetBonus()
+    {
+        bonusCurrent = 0f;
+    }
 
     void Start()
     {
         slider.minValue = 0;
         slider.maxValue = totalMax;
         smoothValue = baseMinValue;
-        bonusCurrent = 0; //充能初始为0
+        bonusCurrent = 0;
 
         fillAreaRt = slider.fillRect.parent.GetComponent<RectTransform>();
         hintRt = hintRangeImage.rectTransform;
         bonusRt = bonusChargeImage.rectTransform;
 
-        //hint锚点
         hintRt.anchorMin = new Vector2(0, 0);
         hintRt.anchorMax = new Vector2(0, 1);
         hintRt.pivot = new Vector2(0, 0.5f);
 
-        //⭐第四层Bonus锚点设置
         bonusRt.anchorMin = new Vector2(0, 0);
         bonusRt.anchorMax = new Vector2(0, 1);
         bonusRt.pivot = new Vector2(0, 0.5f);
@@ -67,13 +81,14 @@ public class ThreeLayerNativeSlider : MonoBehaviour
         smoothValue = Mathf.Lerp(smoothValue, targetRawValue, Time.deltaTime * smoothSpeed);
         slider.value = smoothValue;
 
-        //⭐第四层充能逻辑
         UpdateBonusCharge();
+
+        if (displayText != null)
+        {
+            displayText.text = Mathf.Round(smoothValue).ToString();
+        }
     }
 
-    /// <summary>
-    /// 水平角度计算，忽略Y轴俯仰
-    /// </summary>
     float CalcValueByAngle()
     {
         Vector3 dirTarget = (targetObject.position - playerTransform.position).normalized;
@@ -90,27 +105,25 @@ public class ThreeLayerNativeSlider : MonoBehaviour
         return val;
     }
 
-    /// <summary>
-    /// 更新第四层充能
-    /// </summary>
     void UpdateBonusCharge()
     {
-        //判断是否处于75~80区间
+        // 1. 判断视角是否在充电区
         bool inChargeZone = smoothValue >= bonusStartThreshold;
 
-        if (inChargeZone)
+        // 2. 判断距离是否在阈值内
+        float distance = Vector3.Distance(playerTransform.position, targetObject.position);
+        bool isCloseEnough = distance <= chargeDistanceThreshold;
+
+        // 只有同时满足视角和距离条件，才充电；否则衰减
+        if (inChargeZone && isCloseEnough)
         {
-            //在区间内，持续充能，上限80
             bonusCurrent += Time.deltaTime * bonusChargeSpeed;
             bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
         }
         else
         {
-            if (resetBonusWhenLeave)
-            {
-                bonusCurrent = 0;
-            }
-            //不重置就保持现有数值不动
+            bonusCurrent -= Time.deltaTime * bonusDecaySpeed;
+            bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
         }
     }
 
@@ -129,9 +142,6 @@ public class ThreeLayerNativeSlider : MonoBehaviour
         hintRt.sizeDelta = new Vector2(width, 0);
     }
 
-    /// <summary>
-    /// ⭐绘制第四层充能条
-    /// </summary>
     void DrawBonusCharge()
     {
         float totalWidth = fillAreaRt.rect.width;
