@@ -4,52 +4,66 @@ using System.Collections;
 
 public class Level1Manager : MonoBehaviour
 {
+    [System.Serializable]
+    public class LevelData
+    {
+        public string phaseName = "Phase";
+        public GameObject[] targets;               // 本关需要注视的目标
+
+        // San 值范围
+        public float sanMin = 0f;
+        public float sanMax = 20f;
+
+        // Slider 显示范围（baseMin ~ levelMax）
+        public float sliderBaseMin = 60f;
+        public float sliderLevelMax = 80f;
+
+        // 充能触发阈值和充满值
+        public float bonusStartThreshold = 75f;
+        public float bonusFullValue = 80f;
+
+        [Tooltip("充能条宽度达到该值后进入下一关")]
+        public float chargeThreshold = 160f;
+
+        public string hintText = "Look at the target";
+
+        [Header("顺序切换设置（仅当 targets 有多个时生效）")]
+        public bool enableSequentialTargets = false;
+        [Tooltip("注视当前目标达到 San 最大值后，保持此秒数才切换到下一个目标")]
+        public float holdTimeToSwitch = 1.0f;
+    }
+
     [Header("系统引用")]
-    public SanSystem sanSystem;
     public Transform playerTransform;
     public Transform cameraTransform;
-    public ThreeLayerNativeSlider threeLayerSlider;
+    public ThreeLayerNativeSlider threeLayerSlider;   // 现在负责视角 + San 值
 
-    [Header("目标对象")]
-    public GameObject[] tombTargets;   // 第一阶段目标（墓碑）
-    public GameObject[] tableTargets;  // 第二阶段目标（桌台）
+    [Header("关卡配置（按顺序）")]
+    public LevelData[] levels;
 
     [Header("中央提示UI")]
     public CanvasGroup hintCanvasGroup;
     public TextMeshProUGUI hintText;
 
-    [Header("右上角UI（必须挂载CanvasGroup）")]
+    [Header("右上角UI")]
     public CanvasGroup topRightCanvasGroup;
     public TextMeshProUGUI levelNameText;
     public TextMeshProUGUI progressText;
 
-    [Header("San值参数")]
-    public float sanDefault = 60f;
-    public float sanLookTarget = 80f;
-
     [Header("视野角度阈值")]
     public float viewAngleThreshold = 15f;
-
-    [Header("切换阈值（像素宽度）")]
-    public float chargeWidthThreshold = 640f;
 
     [Header("淡入淡出设置")]
     public float fadeDuration = 0.8f;
 
-    private enum Phase { Tomb, Table }
-    private Phase currentPhase = Phase.Tomb;
-
+    private int currentLevelIndex = 0;
+    private int currentTargetIndex = 0;
+    private float timeLookingAtTarget = 0f;
     private bool isFading = false;
-    private bool hasSwitchedToTable = false;
     private Coroutine fadeCoroutine = null;
-
-    // 当前阶段的主目标（用于充能检测）
-    private Transform currentMainTarget;
 
     void Start()
     {
-        // 自动获取引用
-        if (sanSystem == null) sanSystem = FindObjectOfType<SanSystem>();
         if (playerTransform == null) playerTransform = transform;
         if (cameraTransform == null) cameraTransform = Camera.main?.transform;
         if (threeLayerSlider == null) threeLayerSlider = FindObjectOfType<ThreeLayerNativeSlider>();
@@ -57,126 +71,98 @@ public class Level1Manager : MonoBehaviour
         ProgressMonitor pm = FindObjectOfType<ProgressMonitor>();
         if (pm != null) pm.enabled = false;
 
-        // 检查引用
-        if (hintCanvasGroup == null)
-            Debug.LogWarning("hintCanvasGroup 未绑定");
-        if (topRightCanvasGroup == null)
-            Debug.LogWarning("topRightCanvasGroup 未绑定！右上角淡入淡出将无效。");
-        if (levelNameText == null || progressText == null)
-            Debug.LogWarning("右上角文本未完全绑定");
+        if (levels == null || levels.Length == 0)
+        {
+            Debug.LogError("未配置任何关卡！");
+            return;
+        }
 
-        sanSystem.SetTargetSan(sanDefault, true);
-
-        // 设置初始目标（墓碑）
-        UpdateCurrentTarget(Phase.Tomb);
-
-        // 初始化UI
-        if (hintText != null) hintText.text = "Look at the Tomb";
-        if (levelNameText != null) levelNameText.text = "Tomb";
-        if (progressText != null) progressText.text = "Look at the Tomb";
+        ApplyLevel(currentLevelIndex, instant: true);
         SetAllAlphas(1f);
-
-        // 重置充能
-        if (threeLayerSlider != null) threeLayerSlider.ResetBonus();
+        threeLayerSlider?.ResetBonus();
     }
 
     void Update()
     {
-        // 仅在Tomb阶段且未切换且未淡入淡出中检测切换
-        if (currentPhase == Phase.Tomb && !hasSwitchedToTable && !isFading)
+        if (isFading) return;
+
+        // 检测当前关卡是否完成（充能宽度达到阈值）
+        if (threeLayerSlider != null && currentLevelIndex < levels.Length - 1)
         {
-            if (threeLayerSlider != null && threeLayerSlider.BonusWidth >= chargeWidthThreshold)
+            float currentWidth = threeLayerSlider.BonusWidth;
+            float threshold = levels[currentLevelIndex].chargeThreshold;
+            if (currentWidth >= threshold)
             {
-                Debug.Log($"✅ 充能条宽度达到 {threeLayerSlider.BonusWidth:F1}，触发切换！");
+                Debug.Log($"✅ 关卡 [{levels[currentLevelIndex].phaseName}] 充能达到 {currentWidth:F1} / {threshold}，进入下一关！");
                 if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-                fadeCoroutine = StartCoroutine(SwitchPhaseWithFade(Phase.Table, "Find the table"));
-                hasSwitchedToTable = true;
+                fadeCoroutine = StartCoroutine(SwitchToLevel(currentLevelIndex + 1));
             }
         }
 
-        // 阶段San值控制
-        switch (currentPhase)
+        // 控制 San 值
+        if (currentLevelIndex < levels.Length)
         {
-            case Phase.Tomb:
-                HandleTombPhase();
-                break;
-            case Phase.Table:
-                HandleTablePhase();
-                break;
+            LevelData level = levels[currentLevelIndex];
+            if (level.enableSequentialTargets && level.targets != null && level.targets.Length > 1)
+            {
+                HandleSequentialTargets(level);
+            }
+            else
+            {
+                bool lookingAtTarget = CheckAnyTargetInSight(level.targets);
+                float targetSan = lookingAtTarget ? level.sanMax : level.sanMin;
+                threeLayerSlider?.SetTargetSan(targetSan, true);
+            }
         }
     }
 
-    #region 阶段逻辑
-
-    private void HandleTombPhase()
+    private void HandleSequentialTargets(LevelData level)
     {
-        bool lookingAtTomb = CheckAnyTargetInSight(tombTargets);
-        float targetSan = lookingAtTomb ? sanLookTarget : sanDefault;
-        sanSystem.SetTargetSan(targetSan, true);
-    }
-
-    private void HandleTablePhase()
-    {
-        bool lookingAtTable = CheckAnyTargetInSight(tableTargets);
-        float targetSan = lookingAtTable ? sanLookTarget : sanDefault;
-        sanSystem.SetTargetSan(targetSan, true);
-    }
-
-    #endregion
-
-    #region 辅助方法
-
-    private bool CheckAnyTargetInSight(GameObject[] targets)
-    {
-        if (targets == null || targets.Length == 0 || cameraTransform == null) return false;
-
-        Vector3 camForward = cameraTransform.forward;
-        camForward.y = 0;
-        if (camForward.sqrMagnitude < 0.001f) return false;
-        camForward.Normalize();
-
-        foreach (GameObject target in targets)
+        if (currentTargetIndex >= level.targets.Length)
         {
-            if (target == null) continue;
-            Vector3 dirToTarget = target.transform.position - playerTransform.position;
-            dirToTarget.y = 0;
-            if (dirToTarget.sqrMagnitude < 0.001f) continue;
-            dirToTarget.Normalize();
-
-            float angle = Vector3.Angle(camForward, dirToTarget);
-            if (angle <= viewAngleThreshold) return true;
+            threeLayerSlider?.SetTargetSan(level.sanMin, true);
+            return;
         }
-        return false;
-    }
 
-    /// <summary>
-    /// 更新当前目标（供ThreeLayerSlider使用）
-    /// </summary>
-    private void UpdateCurrentTarget(Phase phase)
-    {
-        if (threeLayerSlider == null) return;
+        GameObject currentTarget = level.targets[currentTargetIndex];
+        bool looking = CheckSpecificTargetInSight(currentTarget);
 
-        GameObject targetObj = null;
-        if (phase == Phase.Tomb && tombTargets != null && tombTargets.Length > 0)
-            targetObj = tombTargets[0];
-        else if (phase == Phase.Table && tableTargets != null && tableTargets.Length > 0)
-            targetObj = tableTargets[0];
-
-        if (targetObj != null)
+        if (looking)
         {
-            threeLayerSlider.targetObject = targetObj.transform;
-            currentMainTarget = targetObj.transform;
+            threeLayerSlider?.SetTargetSan(level.sanMax, true);
+            float currentSan = threeLayerSlider != null ? threeLayerSlider.CurrentSan : 0f;
+            if (currentSan >= level.sanMax - 0.01f)
+            {
+                timeLookingAtTarget += Time.deltaTime;
+                if (timeLookingAtTarget >= level.holdTimeToSwitch)
+                {
+                    currentTargetIndex++;
+                    timeLookingAtTarget = 0f;
+                    threeLayerSlider?.SetTargetSan(level.sanMin, true);
+                    if (currentTargetIndex < level.targets.Length)
+                    {
+                        threeLayerSlider.targetObject = level.targets[currentTargetIndex].transform;
+                        Debug.Log($"🔄 切换到下一个目标: {level.targets[currentTargetIndex].name}");
+                    }
+                    else
+                    {
+                        Debug.Log($"🏁 所有目标已注视完成！");
+                    }
+                }
+            }
+            else
+            {
+                timeLookingAtTarget = 0f;
+            }
         }
         else
         {
-            Debug.LogWarning($"阶段 {phase} 没有可用的目标对象！");
+            threeLayerSlider?.SetTargetSan(level.sanMin, true);
+            timeLookingAtTarget = 0f;
         }
     }
 
-    /// <summary>
-    /// 带缓出缓入的切换协程
-    /// </summary>
-    private IEnumerator SwitchPhaseWithFade(Phase newPhase, string newHint)
+    private IEnumerator SwitchToLevel(int newIndex)
     {
         isFading = true;
         float halfDuration = fadeDuration / 2f;
@@ -193,19 +179,7 @@ public class Level1Manager : MonoBehaviour
         }
         SetAllAlphas(0f);
 
-        // 更新阶段、文字、目标、重置充能
-        currentPhase = newPhase;
-        UpdateCurrentTarget(newPhase);          // 切换目标对象
-
-        if (hintText != null) hintText.text = newHint;
-        if (levelNameText != null) levelNameText.text = GetCurrentPhaseName();
-        if (progressText != null) progressText.text = newHint;
-
-        // 重置充能条（降至0）
-        if (threeLayerSlider != null)
-            threeLayerSlider.ResetBonus();
-
-        Debug.Log($"🔄 已切换到阶段: {newPhase}，提示: {newHint}，目标已更新，充能重置");
+        ApplyLevel(newIndex, instant: false);
 
         // 淡入
         elapsed = 0f;
@@ -223,6 +197,92 @@ public class Level1Manager : MonoBehaviour
         fadeCoroutine = null;
     }
 
+    private void ApplyLevel(int index, bool instant)
+    {
+        if (index < 0 || index >= levels.Length)
+        {
+            Debug.LogWarning($"关卡索引 {index} 超出范围，停在当前关");
+            return;
+        }
+
+        currentLevelIndex = index;
+        currentTargetIndex = 0;
+        timeLookingAtTarget = 0f;
+        LevelData level = levels[index];
+
+        // 1. 设置目标
+        if (threeLayerSlider != null && level.targets != null && level.targets.Length > 0)
+        {
+            threeLayerSlider.targetObject = level.targets[0].transform;
+        }
+
+        // 2. 更新 ThreeLayerNativeSlider 的参数（视角范围、充能阈值）
+        if (threeLayerSlider != null)
+        {
+            threeLayerSlider.SetLevelParameters(
+                level.sliderBaseMin,
+                level.sliderLevelMax,
+                level.bonusStartThreshold,
+                level.bonusFullValue
+            );
+        }
+
+        // 3. 更新 San 值范围（通过 ThreeLayerNativeSlider）
+        if (threeLayerSlider != null)
+        {
+            threeLayerSlider.SetSanRange(level.sanMin, level.sanMax, level.sanMin);
+        }
+
+        // 4. 重置充能条
+        threeLayerSlider?.ResetBonus();
+
+        // 5. 更新 UI 文字
+        if (hintText != null) hintText.text = level.hintText;
+        if (levelNameText != null) levelNameText.text = level.phaseName;
+        if (progressText != null) progressText.text = level.hintText;
+
+        Debug.Log($"🔁 切换到关卡 [{level.phaseName}]，San范围: {level.sanMin}-{level.sanMax}，通关宽度: {level.chargeThreshold}");
+        if (level.enableSequentialTargets && level.targets.Length > 1)
+            Debug.Log($"🔀 启用顺序切换，共 {level.targets.Length} 个目标，保持时间 {level.holdTimeToSwitch} 秒");
+    }
+
+    private bool CheckAnyTargetInSight(GameObject[] targets)
+    {
+        if (targets == null || targets.Length == 0 || cameraTransform == null) return false;
+
+        Vector3 camForward = cameraTransform.forward;
+        camForward.y = 0;
+        if (camForward.sqrMagnitude < 0.001f) return false;
+        camForward.Normalize();
+
+        foreach (GameObject target in targets)
+        {
+            if (target == null) continue;
+            if (CheckSpecificTargetInSight(target))
+                return true;
+        }
+        return false;
+    }
+
+    private bool CheckSpecificTargetInSight(GameObject target)
+    {
+        if (target == null || cameraTransform == null || playerTransform == null)
+            return false;
+
+        Vector3 camForward = cameraTransform.forward;
+        camForward.y = 0;
+        if (camForward.sqrMagnitude < 0.001f) return false;
+        camForward.Normalize();
+
+        Vector3 dirToTarget = target.transform.position - playerTransform.position;
+        dirToTarget.y = 0;
+        if (dirToTarget.sqrMagnitude < 0.001f) return false;
+        dirToTarget.Normalize();
+
+        float angle = Vector3.Angle(camForward, dirToTarget);
+        return angle <= viewAngleThreshold;
+    }
+
     private float EaseInOut(float t)
     {
         return t < 0.5f ? 2f * t * t : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f;
@@ -234,35 +294,20 @@ public class Level1Manager : MonoBehaviour
         if (topRightCanvasGroup != null) topRightCanvasGroup.alpha = alpha;
     }
 
-    #endregion
-
-    #region 对外接口
-
+    // 对外接口
     public string GetCurrentPhaseName()
     {
-        return currentPhase == Phase.Tomb ? "Tomb" : "Table";
-    }
-
-    public string GetCurrentHint()
-    {
-        return hintText != null ? hintText.text : "";
+        return currentLevelIndex < levels.Length ? levels[currentLevelIndex].phaseName : "Unknown";
     }
 
     public void ResetLevel()
     {
         if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-        currentPhase = Phase.Tomb;
-        hasSwitchedToTable = false;
         isFading = false;
-        UpdateCurrentTarget(Phase.Tomb);
-        sanSystem.SetTargetSan(sanDefault, true);
-        if (hintText != null) hintText.text = "Look at the Tomb";
-        if (levelNameText != null) levelNameText.text = "Tomb";
-        if (progressText != null) progressText.text = "Look at the Tomb";
-        if (threeLayerSlider != null) threeLayerSlider.ResetBonus();
+        currentTargetIndex = 0;
+        timeLookingAtTarget = 0f;
+        ApplyLevel(0, instant: true);
         SetAllAlphas(1f);
         fadeCoroutine = null;
     }
-
-    #endregion
 }

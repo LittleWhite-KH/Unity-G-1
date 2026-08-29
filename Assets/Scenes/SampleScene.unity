@@ -990,11 +990,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d647fc4c56ed68f44a638c057c482064, type: 3}
   m_PrefabInstance: {fileID: 635034454}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &648968105 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: b353647c446615d46862a7c78ef5260a, type: 3}
-  m_PrefabInstance: {fileID: 2056811237}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &706839438
 GameObject:
   m_ObjectHideFlags: 0
@@ -1768,11 +1763,6 @@ PrefabInstance:
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d647fc4c56ed68f44a638c057c482064, type: 3}
   m_PrefabInstance: {fileID: 960852644}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &1075049694 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 62b72b8a29aaf144e92b8f5b00012163, type: 3}
-  m_PrefabInstance: {fileID: 347387260}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1084072527
 GameObject:
@@ -2744,23 +2734,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72b06b378b30b834d9b7a0a8e1623cd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Level1Manager
-  sanSystem: {fileID: 2088418989}
   playerTransform: {fileID: 2088418986}
   cameraTransform: {fileID: 330585546}
   threeLayerSlider: {fileID: 2056748128}
-  tombTargets:
-  - {fileID: 1075049694}
-  tableTargets:
-  - {fileID: 648968105}
+  levels:
+  - phaseName: Tomb
+    targets: []
+    sanMin: 0
+    sanMax: 20
+    sliderBaseMin: 0
+    sliderLevelMax: 20
+    bonusStartThreshold: 15
+    bonusFullValue: 20
+    chargeThreshold: 160
+    hintText: Look at the Tomb
+    enableSequentialTargets: 1
+    holdTimeToSwitch: 1
+  - phaseName: Table
+    targets: []
+    sanMin: 20
+    sanMax: 40
+    sliderBaseMin: 20
+    sliderLevelMax: 40
+    bonusStartThreshold: 35
+    bonusFullValue: 40
+    chargeThreshold: 320
+    hintText: Find the table
+    enableSequentialTargets: 1
+    holdTimeToSwitch: 1
   hintCanvasGroup: {fileID: 0}
   hintText: {fileID: 1950583235}
   topRightCanvasGroup: {fileID: 1165242619}
   levelNameText: {fileID: 1267866192}
   progressText: {fileID: 1342935921}
-  sanDefault: 60
-  sanLookTarget: 80
   viewAngleThreshold: 15
-  chargeWidthThreshold: 640
   fadeDuration: 1
 --- !u!4 &1461284960
 Transform:
@@ -3674,18 +3681,13 @@ MonoBehaviour:
   slider: {fileID: 2056748127}
   hintRangeImage: {fileID: 1084072529}
   bonusChargeImage: {fileID: 810862352}
-  totalMax: 100
-  baseMinValue: 60
-  levelMaxValue: 80
-  bonusStartThreshold: 75
-  bonusFullValue: 80
-  bonusChargeSpeed: 12
-  bonusDecaySpeed: 5
   playerTransform: {fileID: 2088418986}
   targetObject: {fileID: 347387261}
   chargeDistanceThreshold: 10
   smoothSpeed: 2
   displayText: {fileID: 1950583235}
+  sanSlider: {fileID: 0}
+  sanDisplayText: {fileID: 0}
 --- !u!1001 &2056811237
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3960,6 +3962,9 @@ MonoBehaviour:
   sanBestWorldDir: {x: 0, y: 0, z: 1}
   sanSlider: {fileID: 2056748127}
   sanText: {fileID: 1950583235}
+  currentSan: 0
+  targetSan: 0
+  overrideTarget: 0
 --- !u!114 &2088418990
 MonoBehaviour:
   m_ObjectHideFlags: 0

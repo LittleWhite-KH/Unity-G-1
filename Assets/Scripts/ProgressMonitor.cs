@@ -4,15 +4,15 @@ using UnityEngine.UI;
 public class ProgressMonitor : MonoBehaviour
 {
     [Header("San 目标")]
-    public SanSystem sanSystem;
+    public ThreeLayerNativeSlider threeLayerSlider;   // 改为引用 ThreeLayerNativeSlider
     public float requiredSan = 80f;
 
     [Header("计时参数")]
-    public float holdDuration = 5f;      // 需要维持达标的时间（秒）
-    public float fillDuration = 2f;      // 进度条填充动画时长（秒）
+    public float holdDuration = 5f;
+    public float fillDuration = 2f;
 
     [Header("UI 绑定")]
-    public Image progressImage;          // 进度条图像（Image 类型为 Filled）
+    public Image progressImage;
 
     private enum State { Waiting, Holding, Filling, Complete }
     private State currentState = State.Waiting;
@@ -23,8 +23,9 @@ public class ProgressMonitor : MonoBehaviour
     void Update()
     {
         if (isComplete) return;
+        if (threeLayerSlider == null) return;
 
-        float currentSan = sanSystem.GetCurrentSan();
+        float currentSan = threeLayerSlider.GetCurrentSan();
 
         switch (currentState)
         {
@@ -73,12 +74,10 @@ public class ProgressMonitor : MonoBehaviour
                 break;
 
             case State.Complete:
-                // 已完成，保持进度条满
                 break;
         }
     }
 
-    // 重置方法（供外部调用）
     public void Reset()
     {
         currentState = State.Waiting;
@@ -88,13 +87,10 @@ public class ProgressMonitor : MonoBehaviour
         if (progressImage != null) progressImage.fillAmount = 0f;
     }
 
-    public bool IsComplete()
-    {
-        return isComplete;
-    }
+    public bool IsComplete() => isComplete;
 
     private void OnProgressComplete()
     {
-        // 可在此触发后续事件，或通过委托/事件广播
+        // 可触发事件
     }
 }
