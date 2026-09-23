@@ -8,17 +8,14 @@ public class Level1Manager : MonoBehaviour
     public class LevelData
     {
         public string phaseName = "Phase";
-        public GameObject[] targets;               // 本关需要注视的目标
+        public GameObject[] targets;
 
-        // San 值范围
         public float sanMin = 0f;
         public float sanMax = 20f;
 
-        // Slider 显示范围（baseMin ~ levelMax）
         public float sliderBaseMin = 60f;
         public float sliderLevelMax = 80f;
 
-        // 充能触发阈值和充满值
         public float bonusStartThreshold = 75f;
         public float bonusFullValue = 80f;
 
@@ -27,31 +24,29 @@ public class Level1Manager : MonoBehaviour
 
         public string hintText = "Look at the target";
 
-        [Header("顺序切换设置（仅当 targets 有多个时生效）")]
+        [Header("顺序切换设置")]
         public bool enableSequentialTargets = false;
-        [Tooltip("注视当前目标达到 San 最大值后，保持此秒数才切换到下一个目标")]
         public float holdTimeToSwitch = 1.0f;
+
+        [Header("San 值角度控制")]
+        [Tooltip("玩家视线与目标夹角超过此角度时，San 值降至最低（sanMin）；0°时达到最高（sanMax）")]
+        public float sanAngleThreshold = 5f;
     }
 
     [Header("系统引用")]
     public Transform playerTransform;
     public Transform cameraTransform;
-    public ThreeLayerNativeSlider threeLayerSlider;   // 现在负责视角 + San 值
+    public ThreeLayerNativeSlider threeLayerSlider;
 
-    [Header("关卡配置（按顺序）")]
+    [Header("关卡配置")]
     public LevelData[] levels;
 
-    [Header("中央提示UI")]
+    [Header("UI")]
     public CanvasGroup hintCanvasGroup;
     public TextMeshProUGUI hintText;
-
-    [Header("右上角UI")]
     public CanvasGroup topRightCanvasGroup;
     public TextMeshProUGUI levelNameText;
     public TextMeshProUGUI progressText;
-
-    [Header("视野角度阈值")]
-    public float viewAngleThreshold = 15f;
 
     [Header("淡入淡出设置")]
     public float fadeDuration = 0.8f;
@@ -86,20 +81,20 @@ public class Level1Manager : MonoBehaviour
     {
         if (isFading) return;
 
-        // 检测当前关卡是否完成（充能宽度达到阈值）
+        // 检测通关
         if (threeLayerSlider != null && currentLevelIndex < levels.Length - 1)
         {
             float currentWidth = threeLayerSlider.BonusWidth;
             float threshold = levels[currentLevelIndex].chargeThreshold;
             if (currentWidth >= threshold)
             {
-                Debug.Log($"✅ 关卡 [{levels[currentLevelIndex].phaseName}] 充能达到 {currentWidth:F1} / {threshold}，进入下一关！");
+                Debug.Log($"✅ 关卡 [{levels[currentLevelIndex].phaseName}] 完成");
                 if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
                 fadeCoroutine = StartCoroutine(SwitchToLevel(currentLevelIndex + 1));
             }
         }
 
-        // 控制 San 值
+        // 控制 San 值（基于角度）
         if (currentLevelIndex < levels.Length)
         {
             LevelData level = levels[currentLevelIndex];
@@ -109,8 +104,8 @@ public class Level1Manager : MonoBehaviour
             }
             else
             {
-                bool lookingAtTarget = CheckAnyTargetInSight(level.targets);
-                float targetSan = lookingAtTarget ? level.sanMax : level.sanMin;
+                float minAngle = GetMinAngleToTargets(level.targets);
+                float targetSan = CalculateSanFromAngle(minAngle, level.sanAngleThreshold, level.sanMin, level.sanMax);
                 threeLayerSlider?.SetTargetSan(targetSan, true);
             }
         }
@@ -125,43 +120,36 @@ public class Level1Manager : MonoBehaviour
         }
 
         GameObject currentTarget = level.targets[currentTargetIndex];
-        bool looking = CheckSpecificTargetInSight(currentTarget);
+        float angle = GetAngleToSingleTarget(currentTarget);
+        float targetSan = CalculateSanFromAngle(angle, level.sanAngleThreshold, level.sanMin, level.sanMax);
+        threeLayerSlider?.SetTargetSan(targetSan, true);
 
-        if (looking)
+        if (angle < 0.5f && threeLayerSlider.CurrentSan >= level.sanMax - 0.01f)
         {
-            threeLayerSlider?.SetTargetSan(level.sanMax, true);
-            float currentSan = threeLayerSlider != null ? threeLayerSlider.CurrentSan : 0f;
-            if (currentSan >= level.sanMax - 0.01f)
+            timeLookingAtTarget += Time.deltaTime;
+            if (timeLookingAtTarget >= level.holdTimeToSwitch)
             {
-                timeLookingAtTarget += Time.deltaTime;
-                if (timeLookingAtTarget >= level.holdTimeToSwitch)
-                {
-                    currentTargetIndex++;
-                    timeLookingAtTarget = 0f;
-                    threeLayerSlider?.SetTargetSan(level.sanMin, true);
-                    if (currentTargetIndex < level.targets.Length)
-                    {
-                        threeLayerSlider.targetObject = level.targets[currentTargetIndex].transform;
-                        Debug.Log($"🔄 切换到下一个目标: {level.targets[currentTargetIndex].name}");
-                    }
-                    else
-                    {
-                        Debug.Log($"🏁 所有目标已注视完成！");
-                    }
-                }
-            }
-            else
-            {
+                currentTargetIndex++;
                 timeLookingAtTarget = 0f;
+                threeLayerSlider?.SetTargetSan(level.sanMin, true);
+                if (currentTargetIndex < level.targets.Length)
+                {
+                    threeLayerSlider.targetObject = level.targets[currentTargetIndex].transform;
+                    Debug.Log($"🔄 切换到下一个目标: {level.targets[currentTargetIndex].name}");
+                }
+                else
+                {
+                    Debug.Log($"🏁 所有目标已注视完成！");
+                }
             }
         }
         else
         {
-            threeLayerSlider?.SetTargetSan(level.sanMin, true);
             timeLookingAtTarget = 0f;
         }
     }
 
+    // ---- 协程切换关卡 ----
     private IEnumerator SwitchToLevel(int newIndex)
     {
         isFading = true;
@@ -175,7 +163,7 @@ public class Level1Manager : MonoBehaviour
             float t = elapsed / halfDuration;
             float alpha = Mathf.Lerp(1f, 0f, EaseInOut(t));
             SetAllAlphas(alpha);
-            yield return null;
+            yield return null;  // 必需，确保是协程
         }
         SetAllAlphas(0f);
 
@@ -210,79 +198,79 @@ public class Level1Manager : MonoBehaviour
         timeLookingAtTarget = 0f;
         LevelData level = levels[index];
 
-        // 1. 设置目标
         if (threeLayerSlider != null && level.targets != null && level.targets.Length > 0)
         {
             threeLayerSlider.targetObject = level.targets[0].transform;
         }
 
-        // 2. 更新 ThreeLayerNativeSlider 的参数（视角范围、充能阈值）
-        if (threeLayerSlider != null)
-        {
-            threeLayerSlider.SetLevelParameters(
-                level.sliderBaseMin,
-                level.sliderLevelMax,
-                level.bonusStartThreshold,
-                level.bonusFullValue
-            );
-        }
+        threeLayerSlider?.SetLevelParameters(
+            level.sliderBaseMin,
+            level.sliderLevelMax,
+            level.bonusStartThreshold,
+            level.bonusFullValue
+        );
 
-        // 3. 更新 San 值范围（通过 ThreeLayerNativeSlider）
-        if (threeLayerSlider != null)
-        {
-            threeLayerSlider.SetSanRange(level.sanMin, level.sanMax, level.sanMin);
-        }
-
-        // 4. 重置充能条
+        threeLayerSlider?.SetSanRange(level.sanMin, level.sanMax, level.sanMin);
         threeLayerSlider?.ResetBonus();
 
-        // 5. 更新 UI 文字
         if (hintText != null) hintText.text = level.hintText;
         if (levelNameText != null) levelNameText.text = level.phaseName;
         if (progressText != null) progressText.text = level.hintText;
 
-        Debug.Log($"🔁 切换到关卡 [{level.phaseName}]，San范围: {level.sanMin}-{level.sanMax}，通关宽度: {level.chargeThreshold}");
-        if (level.enableSequentialTargets && level.targets.Length > 1)
-            Debug.Log($"🔀 启用顺序切换，共 {level.targets.Length} 个目标，保持时间 {level.holdTimeToSwitch} 秒");
+        Debug.Log($"🔁 切换到关卡 [{level.phaseName}]，San范围: {level.sanMin}-{level.sanMax}，角度阈值: {level.sanAngleThreshold}°");
     }
 
-    private bool CheckAnyTargetInSight(GameObject[] targets)
+    // ---- 角度计算 ----
+    private float GetMinAngleToTargets(GameObject[] targets)
     {
-        if (targets == null || targets.Length == 0 || cameraTransform == null) return false;
+        if (targets == null || targets.Length == 0 || cameraTransform == null || playerTransform == null)
+            return 180f;
 
         Vector3 camForward = cameraTransform.forward;
         camForward.y = 0;
-        if (camForward.sqrMagnitude < 0.001f) return false;
+        if (camForward.sqrMagnitude < 0.001f) return 180f;
         camForward.Normalize();
 
+        float minAngle = 180f;
         foreach (GameObject target in targets)
         {
             if (target == null) continue;
-            if (CheckSpecificTargetInSight(target))
-                return true;
+            Vector3 dirToTarget = target.transform.position - playerTransform.position;
+            dirToTarget.y = 0;
+            if (dirToTarget.sqrMagnitude < 0.001f) continue;
+            dirToTarget.Normalize();
+
+            float angle = Vector3.Angle(camForward, dirToTarget);
+            if (angle < minAngle) minAngle = angle;
         }
-        return false;
+        return minAngle;
     }
 
-    private bool CheckSpecificTargetInSight(GameObject target)
+    private float GetAngleToSingleTarget(GameObject target)
     {
         if (target == null || cameraTransform == null || playerTransform == null)
-            return false;
+            return 180f;
 
         Vector3 camForward = cameraTransform.forward;
         camForward.y = 0;
-        if (camForward.sqrMagnitude < 0.001f) return false;
+        if (camForward.sqrMagnitude < 0.001f) return 180f;
         camForward.Normalize();
 
         Vector3 dirToTarget = target.transform.position - playerTransform.position;
         dirToTarget.y = 0;
-        if (dirToTarget.sqrMagnitude < 0.001f) return false;
+        if (dirToTarget.sqrMagnitude < 0.001f) return 180f;
         dirToTarget.Normalize();
 
-        float angle = Vector3.Angle(camForward, dirToTarget);
-        return angle <= viewAngleThreshold;
+        return Vector3.Angle(camForward, dirToTarget);
     }
 
+    private float CalculateSanFromAngle(float angle, float threshold, float minSan, float maxSan)
+    {
+        float t = Mathf.Clamp01(1f - (angle / threshold));
+        return Mathf.Lerp(minSan, maxSan, t);
+    }
+
+    // ---- 辅助 ----
     private float EaseInOut(float t)
     {
         return t < 0.5f ? 2f * t * t : 1f - Mathf.Pow(-2f * t + 2f, 2f) / 2f;
@@ -294,10 +282,13 @@ public class Level1Manager : MonoBehaviour
         if (topRightCanvasGroup != null) topRightCanvasGroup.alpha = alpha;
     }
 
-    // 对外接口
+    // ---- 对外接口 ----
     public string GetCurrentPhaseName()
     {
-        return currentLevelIndex < levels.Length ? levels[currentLevelIndex].phaseName : "Unknown";
+        if (currentLevelIndex < levels.Length)
+            return levels[currentLevelIndex].phaseName;
+        else
+            return "Unknown";
     }
 
     public void ResetLevel()

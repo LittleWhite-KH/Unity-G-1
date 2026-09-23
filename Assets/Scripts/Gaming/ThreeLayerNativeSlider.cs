@@ -5,7 +5,7 @@ using TMPro;
 public class ThreeLayerNativeSlider : MonoBehaviour
 {
     [Header("原生Slider引用")]
-    public Slider slider;                 // 视角角度 Slider
+    public Slider slider;
     public Image hintRangeImage;
     public Image bonusChargeImage;
 
@@ -20,13 +20,18 @@ public class ThreeLayerNativeSlider : MonoBehaviour
     public float smoothSpeed = 6f;
 
     [Header("数值显示")]
-    public TextMeshProUGUI displayText;   // 显示视角角度值
+    public TextMeshProUGUI displayText;
 
-    // 可选：独立显示 San 值的 Slider 和文本（由外部绑定）
+    // 可选：San Slider 和文本
     public Slider sanSlider;
     public TextMeshProUGUI sanDisplayText;
 
-    // ---- 私有配置参数（由外部通过方法设置） ----
+    // ---- 充能完成阈值与外部脚本引用 ----
+    [Header("充能完成条件")]
+    public float chargeThreshold = 80f;           // 达到此值即完成充能
+    public InteractionManager interactionManager; // 拖拽目标脚本
+
+    // ---- 私有参数 ----
     private float totalMax = 100f;
     private float baseMinValue = 60f;
     private float levelMaxValue = 80f;
@@ -48,11 +53,15 @@ public class ThreeLayerNativeSlider : MonoBehaviour
     private float targetSan;
     private bool overrideSan = false;
 
+    // ---- 充能完成标志 ----
+    private bool isChargeCompleted = false;
+
     // ---- 公共属性 ----
     public float BonusCurrent => bonusCurrent;
     public bool IsBonusFull => bonusCurrent >= bonusFullValue - 0.01f;
     public float BonusWidth => bonusRt != null ? bonusRt.sizeDelta.x : 0f;
     public float CurrentSan => currentSan;
+    public bool IsChargeCompleted => isChargeCompleted;
 
     // ---- 外部设置接口 ----
     public void SetTotalMax(float max)
@@ -73,7 +82,6 @@ public class ThreeLayerNativeSlider : MonoBehaviour
         levelMaxValue = levelMax;
         bonusStartThreshold = startThreshold;
         bonusFullValue = fullValue;
-        // 立即更新平滑值和 Slider 显示
         smoothValue = baseMinValue;
         slider.value = smoothValue;
         if (displayText != null)
@@ -84,11 +92,23 @@ public class ThreeLayerNativeSlider : MonoBehaviour
     {
         sanMin = newMin;
         sanMax = newMax;
+
+        if (sanSlider == null)
+        {
+            TryFindSanSlider();
+        }
+
         if (sanSlider != null)
         {
             sanSlider.minValue = sanMin;
             sanSlider.maxValue = sanMax;
+            Debug.Log($"✅ [ThreeLayerNativeSlider] SanSlider 范围已更新: min={sanMin}, max={sanMax}, Slider名称={sanSlider.name}");
         }
+        else
+        {
+            Debug.LogError("❌ [ThreeLayerNativeSlider] sanSlider 仍然为空，无法设置San值范围！请将场景中的San Slider拖拽到Inspector的sanSlider字段，或确保存在名为'SanSlider'的Slider。");
+        }
+
         currentSan = Mathf.Clamp(currentSan, sanMin, sanMax);
         targetSan = (newTarget >= 0) ? Mathf.Clamp(newTarget, sanMin, sanMax) : Mathf.Clamp(targetSan, sanMin, sanMax);
         overrideSan = true;
@@ -111,23 +131,93 @@ public class ThreeLayerNativeSlider : MonoBehaviour
     public void ResetBonus()
     {
         bonusCurrent = 0f;
+        isChargeCompleted = false;
+        if (interactionManager != null)
+            interactionManager.SetChargeComplete(targetObject.gameObject, false);
+    }
+
+    // ---- 辅助方法：查找San Slider ----
+    private void TryFindSanSlider()
+    {
+        GameObject go = GameObject.Find("SanSlider");
+        if (go != null)
+        {
+            Slider found = go.GetComponent<Slider>();
+            if (found != null && found != slider)
+            {
+                sanSlider = found;
+                Debug.Log($"🔍 [ThreeLayerNativeSlider] 按名称找到 San Slider: {sanSlider.name}");
+                return;
+            }
+        }
+
+        Slider[] allSliders = FindObjectsOfType<Slider>();
+        foreach (Slider s in allSliders)
+        {
+            if (s != slider)
+            {
+                sanSlider = s;
+                Debug.Log($"🔍 [ThreeLayerNativeSlider] 通过 FindObjectsOfType 找到 San Slider: {sanSlider.name}，请确认此Slider确实是San值显示Slider。");
+                return;
+            }
+        }
+
+        sanSlider = null;
+        Debug.LogError("❌ [ThreeLayerNativeSlider] 无法找到用于显示San值的Slider！请手动拖拽或确保场景中存在名为'SanSlider'的Slider。");
     }
 
     // ---- Unity 生命周期 ----
     void Start()
     {
+        if (sanSlider == null)
+        {
+            TryFindSanSlider();
+        }
+
+        if (sanDisplayText == null)
+        {
+            GameObject textGo = GameObject.Find("SanText");
+            if (textGo != null)
+            {
+                TextMeshProUGUI found = textGo.GetComponent<TextMeshProUGUI>();
+                if (found != null)
+                {
+                    sanDisplayText = found;
+                    Debug.Log($"🔍 [ThreeLayerNativeSlider] 按名称找到 San 文本: {sanDisplayText.name}");
+                }
+            }
+            else
+            {
+                TextMeshProUGUI[] allTexts = FindObjectsOfType<TextMeshProUGUI>();
+                foreach (TextMeshProUGUI t in allTexts)
+                {
+                    if (t.text.Contains("SAN") || t.name.Contains("San"))
+                    {
+                        sanDisplayText = t;
+                        Debug.Log($"🔍 [ThreeLayerNativeSlider] 通过文本内容找到 San 文本: {sanDisplayText.name}");
+                        break;
+                    }
+                }
+                if (sanDisplayText == null)
+                    Debug.LogWarning("⚠️ [ThreeLayerNativeSlider] 未找到 San 显示文本，将不更新数值显示。");
+            }
+        }
+
         slider.minValue = 0;
         slider.maxValue = totalMax;
         smoothValue = baseMinValue;
         slider.value = smoothValue;
         bonusCurrent = 0;
+        isChargeCompleted = false;
         currentSan = Mathf.Clamp(0, sanMin, sanMax);
         targetSan = currentSan;
 
+        // 获取 UI 矩形引用（用于绘制）
         fillAreaRt = slider.fillRect.parent.GetComponent<RectTransform>();
         hintRt = hintRangeImage.rectTransform;
         bonusRt = bonusChargeImage.rectTransform;
 
+        // 设置锚点、轴心（确保水平拉伸正确）
         hintRt.anchorMin = new Vector2(0, 0);
         hintRt.anchorMax = new Vector2(0, 1);
         hintRt.pivot = new Vector2(0, 0.5f);
@@ -143,6 +233,10 @@ public class ThreeLayerNativeSlider : MonoBehaviour
             sanSlider.value = currentSan;
         }
         UpdateSanUI();
+
+        // 充能完成标志重置
+        if (interactionManager != null)
+            interactionManager.SetChargeComplete(targetObject.gameObject, false);
     }
 
     void LateUpdate()
@@ -161,7 +255,6 @@ public class ThreeLayerNativeSlider : MonoBehaviour
 
         UpdateBonusCharge();
 
-        // San 值平滑更新
         currentSan = Mathf.Lerp(currentSan, targetSan, Time.deltaTime * sanSmoothSpeed);
         currentSan = Mathf.Clamp(currentSan, sanMin, sanMax);
         UpdateSanUI();
@@ -183,24 +276,66 @@ public class ThreeLayerNativeSlider : MonoBehaviour
         return Mathf.Lerp(baseMinValue, levelMaxValue, t);
     }
 
+    // ---- 充能逻辑（含5度角度判定 + 充能完成锁定） ----
     void UpdateBonusCharge()
     {
         bool inChargeZone = smoothValue >= bonusStartThreshold;
         float distance = Vector3.Distance(playerTransform.position, targetObject.position);
         bool isCloseEnough = distance <= chargeDistanceThreshold;
 
-        if (inChargeZone && isCloseEnough)
+        // 角度判定（5度以内）
+        Vector3 dirTarget = (targetObject.position - playerTransform.position).normalized;
+        dirTarget.y = 0;
+        dirTarget.Normalize();
+        Vector3 playerForward = playerTransform.forward;
+        playerForward.y = 0;
+        playerForward.Normalize();
+        float angle = Vector3.Angle(playerForward, dirTarget);
+        bool isAligned = angle <= 5f;
+
+        bool canCharge = inChargeZone && isCloseEnough && isAligned;
+
+        if (isChargeCompleted)
         {
-            bonusCurrent += Time.deltaTime * bonusChargeSpeed;
-            bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
+            // 已完成：只允许增加，不允许减少
+            if (canCharge)
+            {
+                bonusCurrent += Time.deltaTime * bonusChargeSpeed;
+                bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
+            }
+            // 否则不掉落
         }
         else
         {
-            bonusCurrent -= Time.deltaTime * bonusDecaySpeed;
-            bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
+            if (canCharge)
+            {
+                bonusCurrent += Time.deltaTime * bonusChargeSpeed;
+                bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
+            }
+            else
+            {
+                bonusCurrent -= Time.deltaTime * bonusDecaySpeed;
+                bonusCurrent = Mathf.Clamp(bonusCurrent, 0, bonusFullValue);
+            }
+
+            // 检查是否达到阈值
+            if (bonusCurrent >= chargeThreshold && !isChargeCompleted)
+            {
+                isChargeCompleted = true;
+                if (interactionManager != null)
+                {
+                    interactionManager.SetChargeComplete(targetObject.gameObject, true);
+                    Debug.Log("✅ 充能完成！已触发 InteractionManager。");
+                }
+                else
+                {
+                    Debug.LogWarning("⚠️ 未绑定 InteractionManager 引用，无法触发。");
+                }
+            }
         }
     }
 
+    // ---- UI绘制方法（恢复原始实现，基于 fillAreaRt 宽度） ----
     void DrawHintRange()
     {
         float totalWidth = fillAreaRt.rect.width;
