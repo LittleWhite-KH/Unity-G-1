@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "com.gamelovers.mcp-unity": "file:E:/DSH_Unity/tools/mcp-unity",
     "com.unity.2d.sprite": "1.0.0",
+    "com.unity.ai.assistant": "2.20.0-pre.1",
     "com.unity.cinemachine": "3.1.7",
     "com.unity.collab-proxy": "2.10.2",
     "com.unity.ide.rider": "3.0.38",
