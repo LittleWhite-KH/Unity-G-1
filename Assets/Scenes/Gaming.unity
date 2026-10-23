@@ -1941,7 +1941,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &133641478
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5295,7 +5295,7 @@ MonoBehaviour:
   source: {fileID: 865853549}
   barCount: 10
   updateInterval: 1
-  barColor: {r: 1, g: 1, b: 1, a: 0.95}
+  barColor: {r: 1, g: 1, b: 1, a: 1}
   minHeightRatio: 0.05
 --- !u!222 &433508655
 CanvasRenderer:
@@ -6348,8 +6348,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4291586337
+  m_fontColor: {r: 0.129412, g: 0.411765, b: 0.8, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -12014,7 +12014,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SanBarGraphic
   m_Material: {fileID: 0}
-  m_Color: {r: 0.83, g: 0.845, b: 0.87, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -12022,7 +12022,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   barCount: 100
-  barWidthRatio: 0.55
+  barWidthRatio: 0.54924
   symmetric: 1
   verticalOffset: 0
   value: 45
@@ -22586,8 +22586,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 3657433087
-  m_fontColor: {r: 1, g: 1, b: 1, a: 0.85}
+    rgba: 4289567116
+  m_fontColor: {r: 0.55, g: 0.6, b: 0.68, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
