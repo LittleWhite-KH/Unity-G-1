@@ -61,6 +61,10 @@ public class ChargeSystem : MonoBehaviour
 
     public float sanFollowSpeed = 12f;
 
+    [Header("引导模式")]
+    [Tooltip("只指方向、不充能、不改 SAN 目标（用于找钥匙/找门等阶段）")]
+    public bool guidanceOnly = false;
+
     [Header("方位提示（把波形当成指南针）")]
     [Tooltip("水平视野范围（度）：超出这个角度就完全没有起伏（背对目标时）")]
     public float directionFov = 130f;
@@ -173,6 +177,26 @@ public class ChargeSystem : MonoBehaviour
         }
 
         IsCharging = chargingNow;
+
+        // 引导模式：只更新方位/距离，不充能、不改 SAN 目标。
+        if (guidanceOnly)
+        {
+            UpdateDirectionHint();
+
+            if (sanDisplay != null)
+            {
+                sanDisplay.SetProximityBoost(0f);
+                sanDisplay.SetCoalesce(0f);
+                sanDisplay.SetJitterBoost(0f);
+            }
+
+            if (chargeBar != null)
+            {
+                chargeBar.SetVisible(false);
+            }
+
+            return;
+        }
 
         // SAN：离目标越近越高（每关起点记 0，最高 100，不会低于 0）
         if (sanSystem != null)
@@ -329,6 +353,41 @@ public class ChargeSystem : MonoBehaviour
             sanDisplay.SetCoalesce(0f);
             sanDisplay.SetProximityBoost(0f);
         }
+    }
+
+    /// <summary>
+    /// 把本阶段的 SAN 量程 / 充能参数写进来。-1 表示"沿用当前值"。
+    /// 这样同一个共享 ChargeSystem 可以服务多个距离不同的阶段。
+    /// </summary>
+    public void ApplyPhaseSettings(float sanZero, float sanFull, float chargeDistanceOverride, float angleOverride, float durationOverride)
+    {
+        if (sanZero >= 0f)
+        {
+            sanZeroDistance = sanZero;
+            proximityStartDistance = sanZero;
+        }
+
+        if (sanFull >= 0f)
+        {
+            sanFullDistance = sanFull;
+        }
+
+        if (chargeDistanceOverride >= 0f)
+        {
+            chargeDistance = chargeDistanceOverride;
+        }
+
+        if (angleOverride >= 0f)
+        {
+            angleThreshold = angleOverride;
+        }
+
+        if (durationOverride >= 0f)
+        {
+            chargeDuration = durationOverride;
+        }
+
+        Debug.Log($"[Charge] phase settings: sanZero={sanZeroDistance:0.#} sanFull={sanFullDistance:0.#} chargeDist={chargeDistance:0.#} angle={angleThreshold:0.#} duration={chargeDuration:0.#}");
     }
 
     private float AngleToTarget()

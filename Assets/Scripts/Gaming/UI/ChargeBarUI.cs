@@ -49,13 +49,17 @@ public class ChargeBarUI : MonoBehaviour
 
     private void Awake()
     {
-        targetProgress = previewProgress;
-        displayProgress = previewProgress;
-        warningProgress = previewProgress;
+        // previewProgress 只是编辑器里看样子的静态预览值；运行时必须从 0 开始。
+        // （场景里一度残留 0.35，导致一进游戏底部就有一条 35% 的蓝条。）
+        float initial = Application.isPlaying ? 0f : previewProgress;
+
+        targetProgress = initial;
+        displayProgress = initial;
+        warningProgress = initial;
         ApplyFill(fillRect, displayProgress);
         ApplyFill(warningRect, warningProgress);
 
-        if (group != null && hideWhenIdle && previewProgress <= 0.001f)
+        if (group != null && hideWhenIdle && initial <= 0.001f)
         {
             group.alpha = 0f;
         }

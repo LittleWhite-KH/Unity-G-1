@@ -9,66 +9,66 @@ public class HoverTextDisplay : MonoBehaviour
     [System.Serializable]
     public class HoverItem
     {
-        [Tooltip("ĞèÒª¼ì²âÊó±êĞüÍ£/µã»÷µÄÎïÌå£¨±ØĞëÓĞ Collider£©")]
+        [Tooltip("éœ€è¦æ£€æµ‹é¼ æ ‡æ‚¬åœ/ç‚¹å‡»çš„ç‰©ä½“ï¼ˆå¿…é¡»æœ‰ Colliderï¼‰")]
         public GameObject target;
 
-        [Tooltip("ĞüÍ£Ê±ÏÔÊ¾µÄµÚÒ»Åú TMP ÎÄ×Ö¡£ÎÄ×ÖÄÚÈİÖ±½ÓÊ¹ÓÃ TMP ×é¼şÖĞÒÑÌîĞ´µÄÄÚÈİ")]
+        [Tooltip("æ‚¬åœæ—¶æ˜¾ç¤ºçš„ç¬¬ä¸€æ‰¹ TMP æ–‡å­—ã€‚æ–‡å­—å†…å®¹ç›´æ¥ä½¿ç”¨ TMP ç»„ä»¶ä¸­å·²å¡«å†™çš„å†…å®¹")]
         public TextMeshProUGUI textComponent;
 
-        [Header("µã»÷À©Õ¹")]
+        [Header("ç‚¹å‡»æ‰©å±•")]
         public bool enableClick = true;
 
-        [Tooltip("µã»÷ºóÏÔÊ¾µÄµÚ¶şÅú TMP ÎÄ×Ö¡£ÎÄ×ÖÄÚÈİÖ±½ÓÊ¹ÓÃ TMP ×é¼şÖĞÒÑÌîĞ´µÄÄÚÈİ¡£Êó±êÒÆ¿ªºóÒş²Ø£¨²»ÔÙµÈËÉ¿ªÊó±ê£©")]
+        [Tooltip("ç‚¹å‡»åæ˜¾ç¤ºçš„ç¬¬äºŒæ‰¹ TMP æ–‡å­—ã€‚æ–‡å­—å†…å®¹ç›´æ¥ä½¿ç”¨ TMP ç»„ä»¶ä¸­å·²å¡«å†™çš„å†…å®¹ã€‚é¼ æ ‡ç§»å¼€åéšè—ï¼ˆä¸å†ç­‰æ¾å¼€é¼ æ ‡ï¼‰")]
         public TextMeshProUGUI secondaryText;
 
-        [Header("µã»÷ºóµÄ¶ÁÌõÎÄ×Ö")]
-        [Tooltip("µã»÷ºóÏÔÊ¾µÄ¶ÁÌõ TMP ÎÄ×Ö£¨ÀıÈçÄÚÈİÎª / µÄÄÇ¸ö£©¡£Ä¬ÈÏÒş²Ø£¬Êó±êÒÆ¿ªºóÒş²Ø£»ÏÔÊ¾ÆÚ¼äÑ­»·ÇĞ»»×Ö·ûÄ£Äâ¶ÁÌõ")]
+        [Header("ç‚¹å‡»åçš„è¯»æ¡æ–‡å­—")]
+        [Tooltip("ç‚¹å‡»åæ˜¾ç¤ºçš„è¯»æ¡ TMP æ–‡å­—ï¼ˆä¾‹å¦‚å†…å®¹ä¸º / çš„é‚£ä¸ªï¼‰ã€‚é»˜è®¤éšè—ï¼Œé¼ æ ‡ç§»å¼€åéšè—ï¼›æ˜¾ç¤ºæœŸé—´å¾ªç¯åˆ‡æ¢å­—ç¬¦æ¨¡æ‹Ÿè¯»æ¡")]
         public TextMeshProUGUI loadingText;
 
-        [Tooltip("ÊÇ·ñ°Ñ¶ÁÌõ TMP ÒÆ¶¯µ½ÏÂÃæµÄ×ø±ê¡£È¡Ïû¹´Ñ¡Ôò±£³ÖËü×Ô¼ºµÄÎ»ÖÃ²»¶¯")]
+        [Tooltip("æ˜¯å¦æŠŠè¯»æ¡ TMP ç§»åŠ¨åˆ°ä¸‹é¢çš„åæ ‡ã€‚å–æ¶ˆå‹¾é€‰åˆ™ä¿æŒå®ƒè‡ªå·±çš„ä½ç½®ä¸åŠ¨")]
         public bool overrideLoadingTextPosition = true;
 
-        [Tooltip("¶ÁÌõ TMP µÄĞÂ×ø±ê£¬¶ÔÓ¦ Inspector Àï Transform µÄ Pos X / Pos Y / Pos Z")]
+        [Tooltip("è¯»æ¡ TMP çš„æ–°åæ ‡ï¼Œå¯¹åº” Inspector é‡Œ Transform çš„ Pos X / Pos Y / Pos Z")]
         public Vector3 loadingTextPosition = Vector3.zero;
 
-        [Header("µã»÷Ğı×ªÀ©Õ¹")]
-        [Tooltip("µã»÷ºóÎïÌåÈÆ×ÔÉíÖáĞı×ªµÄ½Ç¶È£¨ÔöÁ¿£©")]
+        [Header("ç‚¹å‡»æ—‹è½¬æ‰©å±•")]
+        [Tooltip("ç‚¹å‡»åç‰©ä½“ç»•è‡ªèº«è½´æ—‹è½¬çš„è§’åº¦ï¼ˆå¢é‡ï¼‰")]
         public float rotationAngle = 90f;
 
-        [Tooltip("Ğı×ª¶¯»­Ê±³¤£¨Ãë£©£¬ÉèÎª 0 ÔòË²¼äĞı×ª")]
+        [Tooltip("æ—‹è½¬åŠ¨ç”»æ—¶é•¿ï¼ˆç§’ï¼‰ï¼Œè®¾ä¸º 0 åˆ™ç¬é—´æ—‹è½¬")]
         public float rotationDuration = 0.5f;
 
-        [Tooltip("Ğı×ª¶¯»­ÇúÏß£¨X=Ê±¼ä±ÈÀı 0~1£¬Y=²åÖµ½ø¶È 0~1£©")]
+        [Tooltip("æ—‹è½¬åŠ¨ç”»æ›²çº¿ï¼ˆX=æ—¶é—´æ¯”ä¾‹ 0~1ï¼ŒY=æ’å€¼è¿›åº¦ 0~1ï¼‰")]
         public AnimationCurve rotationCurve = AnimationCurve.Linear(0, 0, 1, 1);
     }
 
-    [Header("¹ØÁªÎïÌåÓëÁ½Åú TMP ÎÄ×Ö")]
+    [Header("å…³è”ç‰©ä½“ä¸ä¸¤æ‰¹ TMP æ–‡å­—")]
     [SerializeField] private List<HoverItem> items = new List<HoverItem>();
 
-    [Header("ÎÄ×Öµ­Èëµ­³öÉèÖÃ£¨ÏßĞÔ£©")]
+    [Header("æ–‡å­—æ·¡å…¥æ·¡å‡ºè®¾ç½®ï¼ˆçº¿æ€§ï¼‰")]
     [SerializeField] private float fadeDuration = 0.5f;
 
-    [Header("¶ÁÌõ¶¯»­ÉèÖÃ£¨µã»÷ºóÏÔÊ¾µÄ loadingText ÓÃ£©")]
-    [Tooltip("¶ÁÌõÖ¡ĞòÁĞ£¬°´Ë³ĞòÑ­»·²¥·Å¡£Ä¬ÈÏ / - \\ - £¬Ä£Äâ×ªÈ¦¶ÁÌõ")]
+    [Header("è¯»æ¡åŠ¨ç”»è®¾ç½®ï¼ˆç‚¹å‡»åæ˜¾ç¤ºçš„ loadingText ç”¨ï¼‰")]
+    [Tooltip("è¯»æ¡å¸§åºåˆ—ï¼ŒæŒ‰é¡ºåºå¾ªç¯æ’­æ”¾ã€‚é»˜è®¤ / - \\ - ï¼Œæ¨¡æ‹Ÿè½¬åœˆè¯»æ¡")]
     [SerializeField] private string[] loadingFrames = new string[] { "/", "-", "\\", "-" };
 
-    [Tooltip("Ã¿Ò»Ö¡Í£ÁôµÄÊ±¼ä£¨Ãë£©")]
+    [Tooltip("æ¯ä¸€å¸§åœç•™çš„æ—¶é—´ï¼ˆç§’ï¼‰")]
     [SerializeField] private float loadingFrameInterval = 1f;
 
-    // ÄÚ²¿×´Ì¬
+    // å†…éƒ¨çŠ¶æ€
     private GameObject currentTarget;
     private TextMeshProUGUI currentText;
     private readonly Dictionary<TextMeshProUGUI, Coroutine> coroutineMap =
         new Dictionary<TextMeshProUGUI, Coroutine>();
 
-    // ÒÑµã»÷¼¤»îµÄÏî£ºµÚ¶şÅúÎÄ×ÖÓë¶ÁÌõÎÄ×ÖÖ»ÔÚÊó±êÒÆ¿ªºóÒş²Ø
+    // å·²ç‚¹å‡»æ¿€æ´»çš„é¡¹ï¼šç¬¬äºŒæ‰¹æ–‡å­—ä¸è¯»æ¡æ–‡å­—åªåœ¨é¼ æ ‡ç§»å¼€åéšè—
     private readonly List<HoverItem> activatedItems = new List<HoverItem>();
 
-    // ¶ÁÌõ×Ö·ûÇĞ»»Ğ­³Ì
+    // è¯»æ¡å­—ç¬¦åˆ‡æ¢åç¨‹
     private readonly Dictionary<HoverItem, Coroutine> loadingCoroutines =
         new Dictionary<HoverItem, Coroutine>();
 
-    // ¹ÜÀíÎïÌåĞı×ªĞ­³Ì
+    // ç®¡ç†ç‰©ä½“æ—‹è½¬åç¨‹
     private readonly Dictionary<GameObject, Coroutine> rotationCoroutines =
         new Dictionary<GameObject, Coroutine>();
 
@@ -78,18 +78,18 @@ public class HoverTextDisplay : MonoBehaviour
         {
             if (item.target == null)
             {
-                Debug.LogWarning("HoverTextDisplay ÖĞÓĞÒ»ÏîÎ´°ó¶¨Ä¿±êÎïÌå£¬Çë¼ì²é£¡", this);
+                Debug.LogWarning("HoverTextDisplay ä¸­æœ‰ä¸€é¡¹æœªç»‘å®šç›®æ ‡ç‰©ä½“ï¼Œè¯·æ£€æŸ¥ï¼", this);
                 continue;
             }
 
-            // ²»ÔÙĞŞ¸Ä TMP µÄ text£¬Ö»¸ºÔğÒş²Ø/ÏÔÊ¾ÒÑ¾­ÅÅ°æºÃµÄÎÄ×Ö¡£
+            // ä¸å†ä¿®æ”¹ TMP çš„ textï¼Œåªè´Ÿè´£éšè—/æ˜¾ç¤ºå·²ç»æ’ç‰ˆå¥½çš„æ–‡å­—ã€‚
             if (item.textComponent != null)
             {
                 EnsureCanvasGroupAndHide(item.textComponent);
             }
             else
             {
-                Debug.LogWarning($"ÎïÌå '{item.target.name}' Î´°ó¶¨µÚÒ»Åú TMP ÎÄ×Ö£¬Çë¼ì²é£¡", item.target);
+                Debug.LogWarning($"ç‰©ä½“ '{item.target.name}' æœªç»‘å®šç¬¬ä¸€æ‰¹ TMP æ–‡å­—ï¼Œè¯·æ£€æŸ¥ï¼", item.target);
             }
 
             if (item.secondaryText != null)
@@ -97,7 +97,7 @@ public class HoverTextDisplay : MonoBehaviour
                 EnsureCanvasGroupAndHide(item.secondaryText);
             }
 
-            // ¶ÁÌõÎÄ×ÖÄ¬ÈÏÒş²Ø£¨ËüµÄÎÄ×ÖÄÚÈİÓÉ¶ÁÌõ¶¯»­½Ó¹Ü£¬¼û loadingFrames£©¡£
+            // è¯»æ¡æ–‡å­—é»˜è®¤éšè—ï¼ˆå®ƒçš„æ–‡å­—å†…å®¹ç”±è¯»æ¡åŠ¨ç”»æ¥ç®¡ï¼Œè§ loadingFramesï¼‰ã€‚
             if (item.loadingText != null)
             {
                 EnsureCanvasGroupAndHide(item.loadingText);
@@ -112,7 +112,7 @@ public class HoverTextDisplay : MonoBehaviour
         Vector2 mousePos = Mouse.current.position.ReadValue();
         Ray ray = Camera.main.ScreenPointToRay(new Vector3(mousePos.x, mousePos.y, 0));
 
-        // ±¾Ö¡Êó±êÖ¸ÏòµÄÄ¿±ê£ºÖ»×öÒ»´ÎÉäÏß¼ì²â£¬µã»÷ÓëĞüÍ£¹²ÓÃ¡£
+        // æœ¬å¸§é¼ æ ‡æŒ‡å‘çš„ç›®æ ‡ï¼šåªåšä¸€æ¬¡å°„çº¿æ£€æµ‹ï¼Œç‚¹å‡»ä¸æ‚¬åœå…±ç”¨ã€‚
         HoverItem hoveredItem = null;
         if (Physics.Raycast(ray, out RaycastHit hit))
         {
@@ -120,7 +120,7 @@ public class HoverTextDisplay : MonoBehaviour
             hoveredItem = items.Find(i => i.target == hitObj);
         }
 
-        // 1. Êó±ê×ó¼ü°´ÏÂ£º¼¤»î¸Ã°´Å¥£¬ÏÔÊ¾µÚ¶şÅúÎÄ×ÖÓë¶ÁÌõÎÄ×Ö¡£
+        // 1. é¼ æ ‡å·¦é”®æŒ‰ä¸‹ï¼šæ¿€æ´»è¯¥æŒ‰é’®ï¼Œæ˜¾ç¤ºç¬¬äºŒæ‰¹æ–‡å­—ä¸è¯»æ¡æ–‡å­—ã€‚
         if (Mouse.current.leftButton.wasPressedThisFrame &&
             hoveredItem != null &&
             hoveredItem.enableClick &&
@@ -129,8 +129,8 @@ public class HoverTextDisplay : MonoBehaviour
             ActivateItem(hoveredItem);
         }
 
-        // 2. ÒÑ¼¤»îµÄÏî£ºÊó±êÒÆ¿ªºóÒş²ØµÚ¶şÅúÎÄ×ÖÓë¶ÁÌõÎÄ×Ö¡£
-        //    ÕâÀï²»ÔÙÒÀÀµÊó±êËÉ¿ª£¬Òş²ØÊ±»úÓëµÚÒ»ÅúÎÄ×ÖµÄĞüÍ£Âß¼­±£³ÖÒ»ÖÂ¡£
+        // 2. å·²æ¿€æ´»çš„é¡¹ï¼šé¼ æ ‡ç§»å¼€åéšè—ç¬¬äºŒæ‰¹æ–‡å­—ä¸è¯»æ¡æ–‡å­—ã€‚
+        //    è¿™é‡Œä¸å†ä¾èµ–é¼ æ ‡æ¾å¼€ï¼Œéšè—æ—¶æœºä¸ç¬¬ä¸€æ‰¹æ–‡å­—çš„æ‚¬åœé€»è¾‘ä¿æŒä¸€è‡´ã€‚
         for (int i = activatedItems.Count - 1; i >= 0; i--)
         {
             HoverItem item = activatedItems[i];
@@ -140,7 +140,7 @@ public class HoverTextDisplay : MonoBehaviour
             }
         }
 
-        // 3. ĞüÍ£¼ì²â£ºÏÔÊ¾µÚÒ»ÅúÎÄ×Ö¡£
+        // 3. æ‚¬åœæ£€æµ‹ï¼šæ˜¾ç¤ºç¬¬ä¸€æ‰¹æ–‡å­—ã€‚
         if (hoveredItem != null && hoveredItem.textComponent != null)
         {
             if (currentTarget != hoveredItem.target)
@@ -156,7 +156,7 @@ public class HoverTextDisplay : MonoBehaviour
             return;
         }
 
-        // Êó±êÎ´ĞüÍ£ÔÚÈÎºÎÄ¿±êÉÏ¡£
+        // é¼ æ ‡æœªæ‚¬åœåœ¨ä»»ä½•ç›®æ ‡ä¸Šã€‚
         if (currentTarget != null)
         {
             if (currentText != null)
@@ -167,7 +167,7 @@ public class HoverTextDisplay : MonoBehaviour
         }
     }
 
-    // µã»÷´¦Àí£º²»¸ÄÎÄ×ÖÄÚÈİ¡¢²»ÒÆ¶¯µÚÒ»ÅúÎÄ×Ö£¬Ö»ÏÔÊ¾µÚ¶şÅúÎÄ×ÖÓë¶ÁÌõÎÄ×Ö¡£
+    // ç‚¹å‡»å¤„ç†ï¼šä¸æ”¹æ–‡å­—å†…å®¹ã€ä¸ç§»åŠ¨ç¬¬ä¸€æ‰¹æ–‡å­—ï¼Œåªæ˜¾ç¤ºç¬¬äºŒæ‰¹æ–‡å­—ä¸è¯»æ¡æ–‡å­—ã€‚
     void ActivateItem(HoverItem item)
     {
         if (item == null || item.target == null) return;
@@ -175,7 +175,7 @@ public class HoverTextDisplay : MonoBehaviour
         if (!activatedItems.Contains(item))
             activatedItems.Add(item);
 
-        // µÚÒ»ÅúÎÄ×Ö±£³ÖÔ­Î»²¢±£³ÖÏÔÊ¾¡£
+        // ç¬¬ä¸€æ‰¹æ–‡å­—ä¿æŒåŸä½å¹¶ä¿æŒæ˜¾ç¤ºã€‚
         if (item.textComponent != null)
         {
             ShowTextImmediately(item.textComponent);
@@ -183,23 +183,23 @@ public class HoverTextDisplay : MonoBehaviour
             currentText = item.textComponent;
         }
 
-        // µÚ¶şÅúÎÄ×Ö°´Ô­ÓĞµ­Èë·½Ê½ÏÔÊ¾£¬Î»ÖÃÓëÄÚÈİ¾ù²»ĞŞ¸Ä¡£
+        // ç¬¬äºŒæ‰¹æ–‡å­—æŒ‰åŸæœ‰æ·¡å…¥æ–¹å¼æ˜¾ç¤ºï¼Œä½ç½®ä¸å†…å®¹å‡ä¸ä¿®æ”¹ã€‚
         if (item.secondaryText != null)
         {
             FadeInText(item.secondaryText);
         }
 
-        // ¶ÁÌõÎÄ×Ö£º¿ÉÑ¡µÄĞÂ×ø±ê + Á¢¼´ÏÔÊ¾µÚÒ»Ö¡ + ¿ªÊ¼Ñ­»·ÇĞ»»¡£
+        // è¯»æ¡æ–‡å­—ï¼šå¯é€‰çš„æ–°åæ ‡ + ç«‹å³æ˜¾ç¤ºç¬¬ä¸€å¸§ + å¼€å§‹å¾ªç¯åˆ‡æ¢ã€‚
         ShowLoadingText(item);
 
-        // ±£ÁôÔ­ÓĞµÄÎïÌåĞı×ª¹¦ÄÜ¡£
+        // ä¿ç•™åŸæœ‰çš„ç‰©ä½“æ—‹è½¬åŠŸèƒ½ã€‚
         if (item.rotationAngle != 0f)
         {
             StartRotation(item.target, item.rotationAngle, item.rotationDuration, item.rotationCurve);
         }
     }
 
-    // Êó±êÒÆ¿ª£ºµÚ¶şÅúÎÄ×ÖÓë¶ÁÌõÎÄ×ÖÒ»ÆğÒş²Ø¡£
+    // é¼ æ ‡ç§»å¼€ï¼šç¬¬äºŒæ‰¹æ–‡å­—ä¸è¯»æ¡æ–‡å­—ä¸€èµ·éšè—ã€‚
     void DeactivateItem(HoverItem item)
     {
         if (item == null) return;
@@ -214,12 +214,12 @@ public class HoverTextDisplay : MonoBehaviour
         HideLoadingText(item);
     }
 
-    // ÏÔÊ¾¶ÁÌõÎÄ×Ö£ºÏÈÓ¦ÓÃ¸Ã element Ö¸¶¨µÄĞÂ×ø±ê£¬ÔÙÏÔÊ¾²¢Æô¶¯×Ö·ûÑ­»·¡£
+    // æ˜¾ç¤ºè¯»æ¡æ–‡å­—ï¼šå…ˆåº”ç”¨è¯¥ element æŒ‡å®šçš„æ–°åæ ‡ï¼Œå†æ˜¾ç¤ºå¹¶å¯åŠ¨å­—ç¬¦å¾ªç¯ã€‚
     void ShowLoadingText(HoverItem item)
     {
         if (item == null || item.loadingText == null) return;
 
-        // Ã¿¸ö element ¶¼¿ÉÒÔ¸ø¶ÁÌõ TMP Ò»¸ö×Ô¼ºµÄ×ø±ê£¨Inspector ¿É¸Ä£©¡£
+        // æ¯ä¸ª element éƒ½å¯ä»¥ç»™è¯»æ¡ TMP ä¸€ä¸ªè‡ªå·±çš„åæ ‡ï¼ˆInspector å¯æ”¹ï¼‰ã€‚
         if (item.overrideLoadingTextPosition)
         {
             item.loadingText.rectTransform.localPosition = item.loadingTextPosition;
@@ -232,7 +232,7 @@ public class HoverTextDisplay : MonoBehaviour
         loadingCoroutines[item] = StartCoroutine(LoadingCycleCoroutine(item));
     }
 
-    // Òş²Ø¶ÁÌõÎÄ×Ö£ºÍ£Ö¹×Ö·ûÑ­»·²¢µ­³ö£¨ÓëÆäËüÎÄ×ÖÒ»ÖÂ£©¡£
+    // éšè—è¯»æ¡æ–‡å­—ï¼šåœæ­¢å­—ç¬¦å¾ªç¯å¹¶æ·¡å‡ºï¼ˆä¸å…¶å®ƒæ–‡å­—ä¸€è‡´ï¼‰ã€‚
     void HideLoadingText(HoverItem item)
     {
         if (item == null) return;
@@ -265,7 +265,7 @@ public class HoverTextDisplay : MonoBehaviour
         }
     }
 
-    // ¶ÁÌõÑ­»·£º°´ loadingFrameInterval ÒÀ´ÎÇĞ»» / - \ - ¡­
+    // è¯»æ¡å¾ªç¯ï¼šæŒ‰ loadingFrameInterval ä¾æ¬¡åˆ‡æ¢ / - \ - â€¦
     IEnumerator LoadingCycleCoroutine(HoverItem item)
     {
         int index = 0;
@@ -392,7 +392,7 @@ public class HoverTextDisplay : MonoBehaviour
         coroutineMap.Remove(text);
     }
 
-    // ÎïÌåĞı×ªÏà¹Ø·½·¨£¨±£ÁôÔ­ÓĞ¹¦ÄÜ£©
+    // ç‰©ä½“æ—‹è½¬ç›¸å…³æ–¹æ³•ï¼ˆä¿ç•™åŸæœ‰åŠŸèƒ½ï¼‰
     void StartRotation(GameObject obj, float angle, float duration, AnimationCurve curve)
     {
         if (obj == null) return;
@@ -415,7 +415,7 @@ public class HoverTextDisplay : MonoBehaviour
 
     IEnumerator RotateCoroutine(GameObject obj, float angle, float duration, AnimationCurve curve)
     {
-        // ±£³ÖÔ­½Å±¾µÄÊµ¼ÊĞĞÎª£ºÈÆÎïÌå×ÔÉíµÄ¾Ö²¿ Z ÖáĞı×ª¡£
+        // ä¿æŒåŸè„šæœ¬çš„å®é™…è¡Œä¸ºï¼šç»•ç‰©ä½“è‡ªèº«çš„å±€éƒ¨ Z è½´æ—‹è½¬ã€‚
         Vector3 axis = obj.transform.forward;
 
         if (duration <= 0f)

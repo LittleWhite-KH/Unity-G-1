@@ -3,10 +3,14 @@ using System.Collections;
 
 public class SceneFadeIn : MonoBehaviour
 {
-    [Header("µ­ÈëËÙ¶È (Alpha ¼õÉÙÁ¿/Ãë)")]
-    public float fadeSpeed = 1.0f;   // ÊıÖµÔ½´ó£¬°×ÆÁÏûÊ§Ô½¿ì
+    [Header("æ·¡å…¥é€Ÿåº¦ (Alpha å‡å°‘é‡/ç§’)")]
+    public float fadeSpeed = 1.0f;   // æ•°å€¼è¶Šå¤§ï¼Œç™½å±æ¶ˆå¤±è¶Šå¿«
+
+    [Tooltip("æ·¡å…¥å®Œæˆåæ˜¯å¦åœç”¨é®ç½© Canvasï¼ˆæ¨èå¼€å¯ï¼šé€æ˜å…¨å± UI ä»ä¼šå‚ä¸å°„çº¿æ£€æµ‹ä¸åˆæ‰¹ï¼‰")]
+    public bool deactivateWhenDone = true;
 
     private UnityEngine.UI.Image fadeImage;
+    private GameObject fadeCanvas;
 
     void Start()
     {
@@ -14,26 +18,30 @@ public class SceneFadeIn : MonoBehaviour
         StartCoroutine(FadeInCoroutine());
     }
 
-    // ´´½¨È«ÆÁ°×É«ÕÚÕÖ Canvas ºÍ Image
+    // åˆ›å»ºå…¨å±ç™½è‰²é®ç½© Canvas å’Œ Image
     private void CreateFadeCanvas()
     {
-        GameObject canvasObj = new GameObject("FadeInCanvas");
-        canvasObj.transform.SetParent(transform);
+        fadeCanvas = new GameObject("FadeInCanvas");
+        fadeCanvas.transform.SetParent(transform);
 
-        Canvas canvas = canvasObj.AddComponent<Canvas>();
+        Canvas canvas = fadeCanvas.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 999;   // È·±£¸²¸ÇËùÓĞ UI
+        canvas.sortingOrder = 999;   // ç¡®ä¿è¦†ç›–æ‰€æœ‰ UI
 
-        canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
-        canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+        fadeCanvas.AddComponent<UnityEngine.UI.CanvasScaler>();
+        fadeCanvas.AddComponent<UnityEngine.UI.GraphicRaycaster>();
 
         GameObject imageObj = new GameObject("FadeImage");
-        imageObj.transform.SetParent(canvasObj.transform);
+        imageObj.transform.SetParent(fadeCanvas.transform);
 
         fadeImage = imageObj.AddComponent<UnityEngine.UI.Image>();
-        fadeImage.color = new Color(1, 1, 1, 1); // ³õÊ¼ÎªÍêÈ«²»Í¸Ã÷£¨È«°×£©
+        fadeImage.color = new Color(1, 1, 1, 1); // åˆå§‹ä¸ºå®Œå…¨ä¸é€æ˜ï¼ˆå…¨ç™½ï¼‰
 
-        // À­ÉìÖÁÈ«ÆÁ
+        // å…³é”®ä¿®å¤ï¼šæ·¡å…¥é®ç½©åªè´Ÿè´£è§†è§‰ï¼Œç»ä¸èƒ½åƒé¼ æ ‡å°„çº¿ã€‚
+        // å¦åˆ™ 1 ç§’æ·¡å‡ºåè¿™å±‚å…¨å±é€æ˜ Image ä¼šä¸€ç›´æŒ¡åœ¨åœ°å›¾ BACKã€ä¾§æ æŒ‰é’®ç­‰æ‰€æœ‰ UI ä¸Šé¢ã€‚
+        fadeImage.raycastTarget = false;
+
+        // æ‹‰ä¼¸è‡³å…¨å±
         RectTransform rect = fadeImage.rectTransform;
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
@@ -50,10 +58,13 @@ public class SceneFadeIn : MonoBehaviour
             fadeImage.color = new Color(1, 1, 1, alpha);
             yield return null;
         }
-        fadeImage.color = new Color(1, 1, 1, 0); // ÍêÈ«Í¸Ã÷
 
-        // ¿ÉÑ¡£ºÈç¹û²»ÔÙĞèÒªÕÚÕÖ£¬¿ÉÒÔÏú»Ù Canvas£¬µ«±£ÁôÒ²²»Ó°Ïì
-        // Destroy(fadeImage.transform.parent.gameObject);
-        // »ò±£ÁôÒÔ±¸ºóĞøÊ¹ÓÃ
+        fadeImage.color = new Color(1, 1, 1, 0); // å®Œå…¨é€æ˜
+
+        // æ·¡å…¥ç»“æŸååœç”¨æ•´å—é®ç½©ï¼Œé¿å…å®ƒç»§ç»­å‚ä¸ UI çš„å°„çº¿æ£€æµ‹ä¸ Canvas é‡å»ºã€‚
+        if (deactivateWhenDone && fadeCanvas != null)
+        {
+            fadeCanvas.SetActive(false);
+        }
     }
 }

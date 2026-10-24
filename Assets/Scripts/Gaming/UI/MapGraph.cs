@@ -55,6 +55,26 @@ namespace Outdoor.UI
 
         public List<Node> Nodes { get { return nodes; } }
 
+        /// <summary>关卡构建工具用：整表替换点位（会触发重画）。</summary>
+        public void ConfigureNodes(List<Node> newNodes)
+        {
+            nodes = newNodes ?? new List<Node>();
+            Changed();
+        }
+
+        /// <summary>只改某个点的"已解锁"状态。</summary>
+        public void SetDiscovered(string id, bool value)
+        {
+            Node n = Find(id);
+            if (n == null || n.discovered == value)
+            {
+                return;
+            }
+
+            n.discovered = value;
+            Changed();
+        }
+
         /// <summary>下一个要去的目标点（策划案 Part1 第 5 步）。</summary>
         public Node NextTarget
         {

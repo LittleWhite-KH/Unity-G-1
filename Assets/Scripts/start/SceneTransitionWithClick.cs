@@ -5,23 +5,23 @@ using System.Collections;
 
 public class SceneTransitionWithClick : MonoBehaviour
 {
-    [Header("Ä¿±êÎïÌå£¨Ğè´ø Collider£©")]
-    public GameObject targetObject;          // Êó±êĞèÒªµã»÷µÄÎïÌå
+    [Header("ç›®æ ‡ç‰©ä½“ï¼ˆéœ€å¸¦ Colliderï¼‰")]
+    public GameObject targetObject;          // é¼ æ ‡éœ€è¦ç‚¹å‡»çš„ç‰©ä½“
 
-    [Header("¹ı¶ÉÉèÖÃ")]
-    public float fadeSpeed = 1f;             // ±ä°×ËÙ¶È£¨Alpha ÔöÁ¿/Ãë£©
-    public string nextSceneName;             // ÒªÌø×ªµÄ³¡¾°Ãû³Æ
+    [Header("è¿‡æ¸¡è®¾ç½®")]
+    public float fadeSpeed = 1f;             // å˜ç™½é€Ÿåº¦ï¼ˆAlpha å¢é‡/ç§’ï¼‰
+    public string nextSceneName;             // è¦è·³è½¬çš„åœºæ™¯åç§°
 
-    private bool objectClicked = false;      // ÊÇ·ñÒÑµã»÷Ä¿±ê
-    private bool transitionStarted = false;  // ÊÇ·ñÒÑ¿ªÊ¼±ä°×
-    private UnityEngine.UI.Image fadeImage;  // È«ÆÁ°×É«ÕÚÕÖ
+    private bool objectClicked = false;      // æ˜¯å¦å·²ç‚¹å‡»ç›®æ ‡
+    private bool transitionStarted = false;  // æ˜¯å¦å·²å¼€å§‹å˜ç™½
+    private UnityEngine.UI.Image fadeImage;  // å…¨å±ç™½è‰²é®ç½©
 
     private void Start()
     {
         CreateFadeCanvas();
     }
 
-    // ´´½¨È«ÆÁ Canvas ºÍ Image£¨×Ô¶¯¸²¸ÇËùÓĞ UI£©
+    // åˆ›å»ºå…¨å± Canvas å’Œ Imageï¼ˆè‡ªåŠ¨è¦†ç›–æ‰€æœ‰ UIï¼‰
     private void CreateFadeCanvas()
     {
         GameObject canvasObj = new GameObject("FadeCanvas");
@@ -29,7 +29,7 @@ public class SceneTransitionWithClick : MonoBehaviour
 
         Canvas canvas = canvasObj.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 999;   // È·±£ÔÚ×îÉÏ²ã
+        canvas.sortingOrder = 999;   // ç¡®ä¿åœ¨æœ€ä¸Šå±‚
 
         canvasObj.AddComponent<UnityEngine.UI.CanvasScaler>();
         canvasObj.AddComponent<UnityEngine.UI.GraphicRaycaster>();
@@ -38,9 +38,9 @@ public class SceneTransitionWithClick : MonoBehaviour
         imageObj.transform.SetParent(canvasObj.transform);
 
         fadeImage = imageObj.AddComponent<UnityEngine.UI.Image>();
-        fadeImage.color = new Color(1, 1, 1, 0); // È«°×£¬µ«ÍêÈ«Í¸Ã÷
+        fadeImage.color = new Color(1, 1, 1, 0); // å…¨ç™½ï¼Œä½†å®Œå…¨é€æ˜
 
-        // À­Éìµ½È«ÆÁ
+        // æ‹‰ä¼¸åˆ°å…¨å±
         RectTransform rect = fadeImage.rectTransform;
         rect.anchorMin = Vector2.zero;
         rect.anchorMax = Vector2.one;
@@ -50,7 +50,7 @@ public class SceneTransitionWithClick : MonoBehaviour
 
     private void Update()
     {
-        // 1. ¼ì²âÊó±ê×ó¼üµã»÷£¨Ê¹ÓÃĞÂÊäÈëÏµÍ³£©
+        // 1. æ£€æµ‹é¼ æ ‡å·¦é”®ç‚¹å‡»ï¼ˆä½¿ç”¨æ–°è¾“å…¥ç³»ç»Ÿï¼‰
         if (!objectClicked && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
@@ -59,12 +59,12 @@ public class SceneTransitionWithClick : MonoBehaviour
                 if (hit.collider.gameObject == targetObject)
                 {
                     objectClicked = true;
-                    Debug.Log("Ä¿±êÎïÌå±»µã»÷£¬ÏÖÔÚ°´ÏÂ¿Õ¸ñ¼ü´¥·¢Ìø×ª");
+                    Debug.Log("ç›®æ ‡ç‰©ä½“è¢«ç‚¹å‡»ï¼Œç°åœ¨æŒ‰ä¸‹ç©ºæ ¼é”®è§¦å‘è·³è½¬");
                 }
             }
         }
 
-        // 2. ¼ì²â¿Õ¸ñ¼ü°´ÏÂ£¨±ØĞëÒÑµã»÷Ä¿±êÇÒÎ´¿ªÊ¼¹ı¶É£©
+        // 2. æ£€æµ‹ç©ºæ ¼é”®æŒ‰ä¸‹ï¼ˆå¿…é¡»å·²ç‚¹å‡»ç›®æ ‡ä¸”æœªå¼€å§‹è¿‡æ¸¡ï¼‰
         if (objectClicked && !transitionStarted && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             transitionStarted = true;
@@ -81,12 +81,12 @@ public class SceneTransitionWithClick : MonoBehaviour
             fadeImage.color = new Color(1, 1, 1, alpha);
             yield return null;
         }
-        fadeImage.color = new Color(1, 1, 1, 1); // È·±£ÍêÈ«°×
+        fadeImage.color = new Color(1, 1, 1, 1); // ç¡®ä¿å®Œå…¨ç™½
 
-        // Ìø×ª³¡¾°
+        // è·³è½¬åœºæ™¯
         if (!string.IsNullOrEmpty(nextSceneName))
             SceneManager.LoadScene(nextSceneName);
         else
-            Debug.LogError("Î´ÉèÖÃÏÂÒ»¸ö³¡¾°Ãû³Æ£¡");
+            Debug.LogError("æœªè®¾ç½®ä¸‹ä¸€ä¸ªåœºæ™¯åç§°ï¼");
     }
 }

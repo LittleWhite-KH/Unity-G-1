@@ -3,15 +3,15 @@ using UnityEngine.UI;
 
 public class ProgressMonitor : MonoBehaviour
 {
-    [Header("San Ä¿±ê")]
-    public ThreeLayerNativeSlider threeLayerSlider;   // ¸ÄÎªÒıÓÃ ThreeLayerNativeSlider
+    [Header("San ç›®æ ‡")]
+    public ThreeLayerNativeSlider threeLayerSlider;   // æ”¹ä¸ºå¼•ç”¨ ThreeLayerNativeSlider
     public float requiredSan = 80f;
 
-    [Header("¼ÆÊ±²ÎÊı")]
+    [Header("è®¡æ—¶å‚æ•°")]
     public float holdDuration = 5f;
     public float fillDuration = 2f;
 
-    [Header("UI °ó¶¨")]
+    [Header("UI ç»‘å®š")]
     public Image progressImage;
 
     private enum State { Waiting, Holding, Filling, Complete }
@@ -68,7 +68,7 @@ public class ProgressMonitor : MonoBehaviour
                 {
                     currentState = State.Complete;
                     isComplete = true;
-                    Debug.Log("½ø¶ÈÌõÍê³É£¡");
+                    Debug.Log("è¿›åº¦æ¡å®Œæˆï¼");
                     OnProgressComplete();
                 }
                 break;
@@ -91,6 +91,6 @@ public class ProgressMonitor : MonoBehaviour
 
     private void OnProgressComplete()
     {
-        // ¿É´¥·¢ÊÂ¼ş
+        // å¯è§¦å‘äº‹ä»¶
     }
 }

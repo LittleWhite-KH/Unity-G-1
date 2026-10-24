@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 public class ObjectCuller : MonoBehaviour
 {
-    [Header("ÌŞ³ıÉèÖÃ")]
-    public float cullDistance = 20f;           // ¿É¼û·¶Î§°ë¾¶
-    public float checkInterval = 0.2f;         // ¼ì²é¼ä¸ô
-    public bool cullColliders = false;         // ÊÇ·ñÍ¬Ê±½ûÓÃÅö×²Æ÷
+    [Header("å‰”é™¤è®¾ç½®")]
+    public float cullDistance = 20f;           // å¯è§èŒƒå›´åŠå¾„
+    public float checkInterval = 0.2f;         // æ£€æŸ¥é—´éš”
+    public bool cullColliders = false;         // æ˜¯å¦åŒæ—¶ç¦ç”¨ç¢°æ’å™¨
 
-    [Header("×Ô¶¯×¢²á")]
-    public bool autoFindObjects = true;        // ÊÇ·ñ×Ô¶¯²éÕÒ³¡¾°ÖĞËùÓĞ´øRendererµÄÎïÌå
-    public LayerMask includeLayers = ~0;       // Òª¹ÜÀíµÄ²ã£¨~0±íÊ¾ËùÓĞ²ã£©
+    [Header("è‡ªåŠ¨æ³¨å†Œ")]
+    public bool autoFindObjects = true;        // æ˜¯å¦è‡ªåŠ¨æŸ¥æ‰¾åœºæ™¯ä¸­æ‰€æœ‰å¸¦Rendererçš„ç‰©ä½“
+    public LayerMask includeLayers = ~0;       // è¦ç®¡ç†çš„å±‚ï¼ˆ~0è¡¨ç¤ºæ‰€æœ‰å±‚ï¼‰
 
-    private Transform player;                  // Íæ¼ÒTransform
+    private Transform player;                  // ç©å®¶Transform
     private List<Renderer> renderers = new List<Renderer>();
     private List<Collider> colliders = new List<Collider>();
     private float sqrCullDistance;
@@ -28,7 +28,7 @@ public class ObjectCuller : MonoBehaviour
             Renderer[] allRenderers = FindObjectsOfType<Renderer>();
             foreach (var rend in allRenderers)
             {
-                // ÅÅ³ıÍæ¼Ò×ÔÉíÒÔ¼°²»ÔÚÖ¸¶¨²ãµÄÎïÌå
+                // æ’é™¤ç©å®¶è‡ªèº«ä»¥åŠä¸åœ¨æŒ‡å®šå±‚çš„ç‰©ä½“
                 if (((1 << rend.gameObject.layer) & includeLayers) != 0 && rend.transform != player)
                 {
                     renderers.Add(rend);
@@ -42,7 +42,7 @@ public class ObjectCuller : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("ObjectCuller: ×Ô¶¯²éÕÒÎ´ÆôÓÃ£¬ÇëÔÚInspectorÊÖ¶¯Ìí¼ÓRendererÁĞ±í¡£");
+            Debug.LogWarning("ObjectCuller: è‡ªåŠ¨æŸ¥æ‰¾æœªå¯ç”¨ï¼Œè¯·åœ¨Inspectoræ‰‹åŠ¨æ·»åŠ Rendereråˆ—è¡¨ã€‚");
         }
 
         UpdateCulling();
@@ -63,13 +63,13 @@ public class ObjectCuller : MonoBehaviour
     {
         Vector3 playerPos = player.position;
 
-        // ±éÀúËùÓĞäÖÈ¾Æ÷£¬Ê¹ÓÃ±ß½ç¿ò£¨±ßÔµ£©ÅĞ¶¨
+        // éå†æ‰€æœ‰æ¸²æŸ“å™¨ï¼Œä½¿ç”¨è¾¹ç•Œæ¡†ï¼ˆè¾¹ç¼˜ï¼‰åˆ¤å®š
         for (int i = 0; i < renderers.Count; i++)
         {
             Renderer rend = renderers[i];
             if (rend == null) continue;
 
-            // ¡¾ºËĞÄ¸Ä¶¯¡¿£º¼ÆËãÍæ¼Òµ½ÎïÌå±ß½ç¿òµÄ×î½ü¾àÀë£¨±ßÔµ¾àÀë£©
+            // ã€æ ¸å¿ƒæ”¹åŠ¨ã€‘ï¼šè®¡ç®—ç©å®¶åˆ°ç‰©ä½“è¾¹ç•Œæ¡†çš„æœ€è¿‘è·ç¦»ï¼ˆè¾¹ç¼˜è·ç¦»ï¼‰
             float sqrDist = rend.bounds.SqrDistance(playerPos);
             bool visible = sqrDist <= sqrCullDistance;
 
@@ -77,7 +77,7 @@ public class ObjectCuller : MonoBehaviour
                 rend.enabled = visible;
         }
 
-        // Èç¹ûÆôÓÃÅö×²Æ÷ÌŞ³ı£¬Í¬ÑùÊ¹ÓÃÅö×²Æ÷µÄ±ß½ç¿ò
+        // å¦‚æœå¯ç”¨ç¢°æ’å™¨å‰”é™¤ï¼ŒåŒæ ·ä½¿ç”¨ç¢°æ’å™¨çš„è¾¹ç•Œæ¡†
         if (cullColliders)
         {
             for (int i = 0; i < colliders.Count; i++)

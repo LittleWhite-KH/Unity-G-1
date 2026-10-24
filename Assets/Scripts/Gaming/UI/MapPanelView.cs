@@ -93,10 +93,13 @@ namespace Outdoor.UI
         [ContextMenu("Rebuild")]
         public void Rebuild()
         {
-            Debug.Log(string.Format("[MapPanelView] Rebuild 进入：mapArea={0} graph={1} 点位={2}",
-                mapArea != null ? mapArea.name : "NULL",
-                graph != null ? graph.name : "NULL",
-                graph != null ? graph.Nodes.Count : -1));
+            if (logRebuild)
+            {
+                Debug.Log(string.Format("[MapPanelView] Rebuild 进入：mapArea={0} graph={1} 点位={2}",
+                    mapArea != null ? mapArea.name : "NULL",
+                    graph != null ? graph.name : "NULL",
+                    graph != null ? graph.Nodes.Count : -1));
+            }
 
             if (mapArea == null || graph == null)
             {
@@ -105,23 +108,26 @@ namespace Outdoor.UI
             }
 
             EnsureLayers();
-            Debug.Log(string.Format("[MapPanelView] EnsureLayers 之后：pathLayer={0} nodeLayer={1}",
-                pathLayer != null ? pathLayer.name : "NULL",
-                nodeLayer != null ? nodeLayer.name : "NULL"));
+
+            if (logRebuild)
+            {
+                Debug.Log(string.Format("[MapPanelView] EnsureLayers 之后：pathLayer={0} nodeLayer={1}",
+                    pathLayer != null ? pathLayer.name : "NULL",
+                    nodeLayer != null ? nodeLayer.name : "NULL"));
+            }
 
             ClearSpawned();
-
-            Debug.Log(string.Format("[MapPanelView] ClearSpawned 之后：pathLayer={0} nodeLayer={1}",
-                pathLayer != null ? pathLayer.name : "NULL",
-                nodeLayer != null ? nodeLayer.name : "NULL"));
 
             DrawPaths();
             DrawNodes();
             UpdatePlayerMarker();
 
-            Debug.Log(string.Format("[MapPanelView] Rebuild 完成：nodeLayer 子物体={0} pathLayer 子物体={1}",
-                nodeLayer != null ? nodeLayer.childCount : -1,
-                pathLayer != null ? pathLayer.transform.childCount : -1));
+            if (logRebuild)
+            {
+                Debug.Log(string.Format("[MapPanelView] Rebuild 完成：nodeLayer 子物体={0} pathLayer 子物体={1}",
+                    nodeLayer != null ? nodeLayer.childCount : -1,
+                    pathLayer != null ? pathLayer.transform.childCount : -1));
+            }
         }
 
         private void EnsureLayers()

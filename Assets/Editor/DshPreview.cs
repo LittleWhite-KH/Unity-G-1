@@ -33,10 +33,17 @@ internal static class DshPreview
         CanvasGroup panelGroup = panelGo != null ? panelGo.GetComponent<CanvasGroup>() : null;
         float savedAlpha = panelGroup != null ? panelGroup.alpha : 1f;
 
+        // 真实打开地图时 MapPanel.ApplyOpenState(true) 会把右上角 Info 隐藏；
+        // 预览是"强制打开"，这里手动模拟一下，否则 LEVEL 文字会从顶栏下方露出来。
+        GameObject infoGo = openMap ? Find("Info") : null;
+        CanvasGroup infoGroup = infoGo != null ? infoGo.GetComponent<CanvasGroup>() : null;
+        float savedInfoAlpha = infoGroup != null ? infoGroup.alpha : 1f;
+
         try
         {
             if (mapGo != null) mapGo.SetActive(true);
             if (panelGroup != null) panelGroup.alpha = 1f;   // 地图关闭时 alpha=0，预览要强制可见
+            if (infoGroup != null) infoGroup.alpha = openMap ? 0f : savedInfoAlpha;
 
             camGo = new GameObject("DshPreviewCamera");
             Camera cam = camGo.AddComponent<Camera>();
@@ -90,6 +97,7 @@ internal static class DshPreview
 
             if (mapGo != null && !mapWasActive) mapGo.SetActive(false);
             if (panelGroup != null) panelGroup.alpha = savedAlpha;
+            if (infoGroup != null) infoGroup.alpha = savedInfoAlpha;
 
             if (camGo != null)
             {

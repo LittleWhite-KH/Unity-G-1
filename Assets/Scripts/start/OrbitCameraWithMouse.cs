@@ -7,37 +7,37 @@ using System.Collections.Generic;
 
 public enum CameraControlMode
 {
-    Orbit,          // Î§ÈÆÄ¿±ê+Æ«ÒÆÖáĞÄĞı×ª£¬¿´ÏòÄ¿±ê
-    Fixed,          // Ïà»úÎ»ÖÃ¹Ì¶¨£¬ÊÓ½ÇĞı×ª£¬¿´ÏòÖáĞÄ
-    WorldOrbit      // Î§ÈÆÊÀ½ç×ø±êÖáĞÄĞı×ª£¬¿´ÏòÖáĞÄ
+    Orbit,          // å›´ç»•ç›®æ ‡+åç§»è½´å¿ƒæ—‹è½¬ï¼Œçœ‹å‘ç›®æ ‡
+    Fixed,          // ç›¸æœºä½ç½®å›ºå®šï¼Œè§†è§’æ—‹è½¬ï¼Œçœ‹å‘è½´å¿ƒ
+    WorldOrbit      // å›´ç»•ä¸–ç•Œåæ ‡è½´å¿ƒæ—‹è½¬ï¼Œçœ‹å‘è½´å¿ƒ
 }
 
 public class OrbitCameraWithMouseHover : MonoBehaviour
 {
-    [Header("¿ØÖÆÄ£Ê½")]
+    [Header("æ§åˆ¶æ¨¡å¼")]
     public CameraControlMode mode = CameraControlMode.WorldOrbit;
 
-    [Header("Ä¬ÈÏÄ¿±êÓëÖáĞÄ£¨Orbit / Fixed Ä£Ê½Ê¹ÓÃ£©")]
+    [Header("é»˜è®¤ç›®æ ‡ä¸è½´å¿ƒï¼ˆOrbit / Fixed æ¨¡å¼ä½¿ç”¨ï¼‰")]
     public Transform defaultTarget;
     public Vector3 localPivotOffset = Vector3.zero;
 
-    [Header("ÊÀ½çÖáĞÄ£¨WorldOrbit Ä£Ê½Ê¹ÓÃ£©")]
+    [Header("ä¸–ç•Œè½´å¿ƒï¼ˆWorldOrbit æ¨¡å¼ä½¿ç”¨ï¼‰")]
     public Vector3 worldPivotPosition = new Vector3(0, 0.4f, 0);
 
-    [Header("Ä¬ÈÏ¾àÀë£¨Orbit / WorldOrbit Ä£Ê½ÓĞĞ§£©")]
+    [Header("é»˜è®¤è·ç¦»ï¼ˆOrbit / WorldOrbit æ¨¡å¼æœ‰æ•ˆï¼‰")]
     public float defaultDistance = 2f;
 
-    [Header("¹Ì¶¨Î»ÖÃ£¨Fixed Ä£Ê½ÓĞĞ§£©")]
+    [Header("å›ºå®šä½ç½®ï¼ˆFixed æ¨¡å¼æœ‰æ•ˆï¼‰")]
     public Vector3 fixedPosition = Vector3.zero;
 
-    [Header("½Ç¶ÈÏŞÖÆ£¨¶È£©")]
+    [Header("è§’åº¦é™åˆ¶ï¼ˆåº¦ï¼‰")]
     public float maxHorizontalAngle = 15f;
     public float maxVerticalAngle = 15f;
 
-    [Header("ÁéÃô¶È")]
+    [Header("çµæ•åº¦")]
     public float sensitivity = 1f;
 
-    [Header("»º¶¯ËÙ¶È£¨½Ç¶È£©")]
+    [Header("ç¼“åŠ¨é€Ÿåº¦ï¼ˆè§’åº¦ï¼‰")]
     public float smoothSpeed = 8f;
 
     [System.Serializable]
@@ -46,53 +46,53 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         public GameObject object1;
         public GameObject object2;
 
-        [Header("ĞüÍ£·Å´ó²ÎÊı")]
-        public float hoverDistance = 1f;          // ĞüÍ£Ê±µÄ¾àÀë£¨Ìæ´úÔ­ hoverDistance£©
-        public float transitionDuration = 1.0f;  // ¹ı¶ÉÊ±³¤£¨·Å´óºÍ»Ö¸´¹²ÓÃ£©
+        [Header("æ‚¬åœæ”¾å¤§å‚æ•°")]
+        public float hoverDistance = 1f;          // æ‚¬åœæ—¶çš„è·ç¦»ï¼ˆæ›¿ä»£åŸ hoverDistanceï¼‰
+        public float transitionDuration = 1.0f;  // è¿‡æ¸¡æ—¶é•¿ï¼ˆæ”¾å¤§å’Œæ¢å¤å…±ç”¨ï¼‰
 
-        [Header("·Å´óÎ»ÖÃÆ«ÒÆ£¨X / Y Öá£¬ÊÀ½ç×ø±ê£©")]
-        [Tooltip("·Å´óºóÏà»úÖáĞÄÏà¶Ô Object1 Î»ÖÃµÄ X ÖáÆ«ÒÆ")]
+        [Header("æ”¾å¤§ä½ç½®åç§»ï¼ˆX / Y è½´ï¼Œä¸–ç•Œåæ ‡ï¼‰")]
+        [Tooltip("æ”¾å¤§åç›¸æœºè½´å¿ƒç›¸å¯¹ Object1 ä½ç½®çš„ X è½´åç§»")]
         public float zoomOffsetX = 0f;
 
-        [Tooltip("·Å´óºóÏà»úÖáĞÄÏà¶Ô Object1 Î»ÖÃµÄ Y ÖáÆ«ÒÆ")]
+        [Tooltip("æ”¾å¤§åç›¸æœºè½´å¿ƒç›¸å¯¹ Object1 ä½ç½®çš„ Y è½´åç§»")]
         public float zoomOffsetY = 0f;
     }
 
-    [Header("ĞüÍ£·Ö×é´¥·¢")]
+    [Header("æ‚¬åœåˆ†ç»„è§¦å‘")]
     public List<TriggerGroup> triggerGroups = new List<TriggerGroup>();
 
-    // ÄÚ²¿×´Ì¬
+    // å†…éƒ¨çŠ¶æ€
     private float currentH, currentV;
     private float targetH, targetV;
     private float baseH, baseV;
     private Vector2 mouseDelta;
 
-    // µ±Ç°Ê¹ÓÃµÄÖáĞÄºÍ¾àÀë
+    // å½“å‰ä½¿ç”¨çš„è½´å¿ƒå’Œè·ç¦»
     private Vector3 currentPivot;
     private float currentDistance;
 
-    // Ä¬ÈÏÖáĞÄ£¨ÓÃÓÚ»Ö¸´£©
+    // é»˜è®¤è½´å¿ƒï¼ˆç”¨äºæ¢å¤ï¼‰
     private Vector3 defaultPivot;
     private float defaultDist;
 
-    // ¹ìµÀ¿ØÖÆÊÇ·ñÆôÓÃ
+    // è½¨é“æ§åˆ¶æ˜¯å¦å¯ç”¨
     private bool orbitEnabled = true;
 
-    // ---------- ĞüÍ£×é×´Ì¬ ----------
-    private int activeGroupIndex = -1;      // -1 ±íÊ¾ÎŞ¼¤»î×é
-    private bool isZooming = false;         // ÊÇ·ñ´¦ÓÚ·Å´ó×´Ì¬£¨º¬¹ı¶ÉÖĞ£©
-    private bool isMoving = false;          // ÊÇ·ñÕıÔÚ¹ı¶É¶¯»­
+    // ---------- æ‚¬åœç»„çŠ¶æ€ ----------
+    private int activeGroupIndex = -1;      // -1 è¡¨ç¤ºæ— æ¿€æ´»ç»„
+    private bool isZooming = false;         // æ˜¯å¦å¤„äºæ”¾å¤§çŠ¶æ€ï¼ˆå«è¿‡æ¸¡ä¸­ï¼‰
+    private bool isMoving = false;          // æ˜¯å¦æ­£åœ¨è¿‡æ¸¡åŠ¨ç”»
     private Coroutine currentTransition = null;
 
-    // ±£´æ¹ı¶ÉÇ°µÄ¹ìµÀ²ÎÊı£¨ÓÃÓÚ»Ö¸´Ê±µÄÆğÊ¼Öµ£©
+    // ä¿å­˜è¿‡æ¸¡å‰çš„è½¨é“å‚æ•°ï¼ˆç”¨äºæ¢å¤æ—¶çš„èµ·å§‹å€¼ï¼‰
     private Vector3 startPivot;
     private float startDistance;
 
-    // Ä¿±êÖµ£¨ÓÉ´¥·¢×é¾ö¶¨£©
+    // ç›®æ ‡å€¼ï¼ˆç”±è§¦å‘ç»„å†³å®šï¼‰
     private Vector3 targetPivot;
     private float targetDistance;
 
-    // ---------- ÉúÃüÖÜÆÚ ----------
+    // ---------- ç”Ÿå‘½å‘¨æœŸ ----------
     private void Start()
     {
         InitializeOrbit();
@@ -100,25 +100,25 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
 
     private void Update()
     {
-        // ´¦ÀíĞüÍ£×é´¥·¢
+        // å¤„ç†æ‚¬åœç»„è§¦å‘
         HandleHoverGroups();
 
-        // Èç¹û¹ìµÀ¿ØÖÆÆôÓÃÇÒÎ´´¦ÓÚ·Å´ó×´Ì¬£¬ÔòÕı³£¸üĞÂ¹ìµÀ£¨Êó±êĞı×ª£©
+        // å¦‚æœè½¨é“æ§åˆ¶å¯ç”¨ä¸”æœªå¤„äºæ”¾å¤§çŠ¶æ€ï¼Œåˆ™æ­£å¸¸æ›´æ–°è½¨é“ï¼ˆé¼ æ ‡æ—‹è½¬ï¼‰
         if (orbitEnabled && !isZooming)
         {
             ReadMouseInput();
             ApplyAngleSmoothing();
             UpdateCamera();
         }
-        // ·ñÔò²»´¦ÀíÊó±êÊäÈë£¨¹ìµÀÔİÍ££©
+        // å¦åˆ™ä¸å¤„ç†é¼ æ ‡è¾“å…¥ï¼ˆè½¨é“æš‚åœï¼‰
     }
 
-    // ---------- ¹ìµÀ¿ØÖÆ³õÊ¼»¯ ----------
+    // ---------- è½¨é“æ§åˆ¶åˆå§‹åŒ– ----------
     private void InitializeOrbit()
     {
         if (mode != CameraControlMode.WorldOrbit && defaultTarget == null)
         {
-            Debug.LogError("OrbitCameraWithMouseHover: Orbit/Fixed Ä£Ê½ĞèÒªÖ¸¶¨ defaultTarget£¡");
+            Debug.LogError("OrbitCameraWithMouseHover: Orbit/Fixed æ¨¡å¼éœ€è¦æŒ‡å®š defaultTargetï¼");
             enabled = false;
             return;
         }
@@ -146,7 +146,7 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         UpdateCamera();
     }
 
-    // ---------- Êó±êÊäÈë£¨ĞÂ¾É Input System ¼æÈİ£© ----------
+    // ---------- é¼ æ ‡è¾“å…¥ï¼ˆæ–°æ—§ Input System å…¼å®¹ï¼‰ ----------
     private void ReadMouseInput()
     {
 #if ENABLE_INPUT_SYSTEM
@@ -182,13 +182,13 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         currentV = Mathf.Lerp(currentV, targetV, smoothSpeed * Time.deltaTime);
     }
 
-    // ---------- ºËĞÄ£ºĞüÍ£×é´¦Àí ----------
+    // ---------- æ ¸å¿ƒï¼šæ‚¬åœç»„å¤„ç† ----------
     private void HandleHoverGroups()
     {
-        // »ñÈ¡Êó±êÏÂËùÓĞÅö×²Ìå
+        // è·å–é¼ æ ‡ä¸‹æ‰€æœ‰ç¢°æ’ä½“
         List<GameObject> hitObjects = GetHitObjects();
 
-        // ²éÕÒµÚÒ»¸öÂú×ãÌõ¼şµÄ×é£¨Á½×éÎïÌåÍ¬Ê±ÃüÖĞ£©
+        // æŸ¥æ‰¾ç¬¬ä¸€ä¸ªæ»¡è¶³æ¡ä»¶çš„ç»„ï¼ˆä¸¤ç»„ç‰©ä½“åŒæ—¶å‘½ä¸­ï¼‰
         int triggeredGroup = -1;
         for (int i = 0; i < triggerGroups.Count; i++)
         {
@@ -201,33 +201,33 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
             }
         }
 
-        // ---------- ×´Ì¬»ú ----------
-        if (activeGroupIndex == -1)  // ÎŞ¼¤»î×é
+        // ---------- çŠ¶æ€æœº ----------
+        if (activeGroupIndex == -1)  // æ— æ¿€æ´»ç»„
         {
             if (triggeredGroup != -1)
             {
-                // ´¥·¢·Å´ó
+                // è§¦å‘æ”¾å¤§
                 StartZoom(triggeredGroup);
             }
         }
-        else  // ÒÑÓĞ¼¤»î×é
+        else  // å·²æœ‰æ¿€æ´»ç»„
         {
             if (isMoving)
             {
-                // ¹ı¶ÉÖĞ£¬ºöÂÔÒ»ÇĞ
+                // è¿‡æ¸¡ä¸­ï¼Œå¿½ç•¥ä¸€åˆ‡
                 return;
             }
-            else  // ¹ı¶ÉÍê³É£¬´¦ÓÚ·Å´ó±£³Ö×´Ì¬
+            else  // è¿‡æ¸¡å®Œæˆï¼Œå¤„äºæ”¾å¤§ä¿æŒçŠ¶æ€
             {
                 var group = triggerGroups[activeGroupIndex];
-                // Ö»¼ì²âµÚ¶ş¸öÎïÌåÊÇ·ñÈÔ±»ĞüÍ£
+                // åªæ£€æµ‹ç¬¬äºŒä¸ªç‰©ä½“æ˜¯å¦ä»è¢«æ‚¬åœ
                 bool stillHoverSecond = hitObjects.Contains(group.object2);
                 if (!stillHoverSecond)
                 {
-                    // ÒÆ³öµÚ¶ş¸öÎïÌå ¡ú ¿ªÊ¼»Ö¸´
+                    // ç§»å‡ºç¬¬äºŒä¸ªç‰©ä½“ â†’ å¼€å§‹æ¢å¤
                     StartRestore();
                 }
-                // ·ñÔò±£³Ö·Å´ó
+                // å¦åˆ™ä¿æŒæ”¾å¤§
             }
         }
     }
@@ -250,31 +250,31 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         return result;
     }
 
-    // ---------- ¿ªÊ¼·Å´ó ----------
+    // ---------- å¼€å§‹æ”¾å¤§ ----------
     private void StartZoom(int groupIndex)
     {
-        // ±£´æµ±Ç°¹ìµÀ×´Ì¬×÷ÎªÆğÊ¼Öµ
+        // ä¿å­˜å½“å‰è½¨é“çŠ¶æ€ä½œä¸ºèµ·å§‹å€¼
         startPivot = currentPivot;
         startDistance = currentDistance;
 
         activeGroupIndex = groupIndex;
         isZooming = true;
-        orbitEnabled = false;      // ½ûÓÃ¹ìµÀ¿ØÖÆ
+        orbitEnabled = false;      // ç¦ç”¨è½¨é“æ§åˆ¶
 
         var group = triggerGroups[groupIndex];
         if (group.object1 == null)
         {
-            Debug.LogWarning($"×é {groupIndex} µÄ Object1 Îª¿Õ£¬È¡Ïû·Å´ó");
+            Debug.LogWarning($"ç»„ {groupIndex} çš„ Object1 ä¸ºç©ºï¼Œå–æ¶ˆæ”¾å¤§");
             RestoreImmediate();
             return;
         }
 
-        // Ä¿±êÖáĞÄ£ºObject1 µÄÎ»ÖÃ + Ã¿×é×Ô¶¨ÒåµÄ X / Y ÖáÆ«ÒÆ
+        // ç›®æ ‡è½´å¿ƒï¼šObject1 çš„ä½ç½® + æ¯ç»„è‡ªå®šä¹‰çš„ X / Y è½´åç§»
         targetPivot = group.object1.transform.position + new Vector3(group.zoomOffsetX, group.zoomOffsetY, 0f);
-        // Ä¿±ê¾àÀë£ºÊ¹ÓÃ×éÄÚÉè¶¨µÄ hoverDistance
+        // ç›®æ ‡è·ç¦»ï¼šä½¿ç”¨ç»„å†…è®¾å®šçš„ hoverDistance
         targetDistance = group.hoverDistance;
 
-        // Æô¶¯Ğ­³ÌÆ½»¬¹ı¶É
+        // å¯åŠ¨åç¨‹å¹³æ»‘è¿‡æ¸¡
         if (currentTransition != null) StopCoroutine(currentTransition);
         currentTransition = StartCoroutine(SmoothTransition(startPivot, startDistance, targetPivot, targetDistance, group.transitionDuration, () =>
         {
@@ -283,30 +283,30 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         isMoving = true;
     }
 
-    // ---------- ¿ªÊ¼»Ö¸´ ----------
+    // ---------- å¼€å§‹æ¢å¤ ----------
     private void StartRestore()
     {
-        // ±£´æµ±Ç°×´Ì¬×÷ÎªÆğÊ¼Öµ
+        // ä¿å­˜å½“å‰çŠ¶æ€ä½œä¸ºèµ·å§‹å€¼
         startPivot = currentPivot;
         startDistance = currentDistance;
 
-        // Ä¿±ê»Ö¸´ÎªÄ¬ÈÏÖáĞÄºÍ¾àÀë
+        // ç›®æ ‡æ¢å¤ä¸ºé»˜è®¤è½´å¿ƒå’Œè·ç¦»
         targetPivot = defaultPivot;
         targetDistance = defaultDist;
 
-        // »ñÈ¡×é¹ı¶ÉÊ±³¤£¨¿É¹²ÓÃ£©
+        // è·å–ç»„è¿‡æ¸¡æ—¶é•¿ï¼ˆå¯å…±ç”¨ï¼‰
         float duration = triggerGroups[activeGroupIndex].transitionDuration;
 
         if (currentTransition != null) StopCoroutine(currentTransition);
         currentTransition = StartCoroutine(SmoothTransition(startPivot, startDistance, targetPivot, targetDistance, duration, () =>
         {
-            // »Ö¸´¹ìµÀ¿ØÖÆ
+            // æ¢å¤è½¨é“æ§åˆ¶
             orbitEnabled = true;
             isZooming = false;
             activeGroupIndex = -1;
-            // Í¬²½½Ç¶ÈÒÔ±ÜÃâÌø±ä
+            // åŒæ­¥è§’åº¦ä»¥é¿å…è·³å˜
             SyncAnglesFromTransform();
-            // ¸üĞÂµ±Ç°ÖáĞÄºÍ¾àÀë£¨ÒÑÓÉ¹ı¶ÉĞ­³ÌÉèÖÃ£©
+            // æ›´æ–°å½“å‰è½´å¿ƒå’Œè·ç¦»ï¼ˆå·²ç”±è¿‡æ¸¡åç¨‹è®¾ç½®ï¼‰
             isMoving = false;
         }));
         isMoving = true;
@@ -323,36 +323,36 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
             StopCoroutine(currentTransition);
             currentTransition = null;
         }
-        // Ö±½ÓÌø»ØÄ¬ÈÏ
+        // ç›´æ¥è·³å›é»˜è®¤
         currentPivot = defaultPivot;
         currentDistance = defaultDist;
         SyncAnglesFromTransform();
         UpdateCamera();
     }
 
-    // ---------- Æ½»¬¹ı¶ÉĞ­³Ì£¨ÖáĞÄºÍ¾àÀë£© ----------
+    // ---------- å¹³æ»‘è¿‡æ¸¡åç¨‹ï¼ˆè½´å¿ƒå’Œè·ç¦»ï¼‰ ----------
     private IEnumerator SmoothTransition(Vector3 fromPivot, float fromDist, Vector3 toPivot, float toDist, float duration, System.Action onComplete)
     {
         float elapsed = 0f;
         while (elapsed < duration)
         {
             float t = elapsed / duration;
-            // Ê¹ÓÃ SmoothStep Ê¹ÔË¶¯¸ü×ÔÈ»
+            // ä½¿ç”¨ SmoothStep ä½¿è¿åŠ¨æ›´è‡ªç„¶
             float smoothT = t * t * (3f - 2f * t);
             currentPivot = Vector3.Lerp(fromPivot, toPivot, smoothT);
             currentDistance = Mathf.Lerp(fromDist, toDist, smoothT);
-            UpdateCamera();  // Ã¿Ö¡¸üĞÂÉãÏñ»úÎ»ÖÃ
+            UpdateCamera();  // æ¯å¸§æ›´æ–°æ‘„åƒæœºä½ç½®
             elapsed += Time.deltaTime;
             yield return null;
         }
-        // È·±£×îÖÕÖµ×¼È·
+        // ç¡®ä¿æœ€ç»ˆå€¼å‡†ç¡®
         currentPivot = toPivot;
         currentDistance = toDist;
         UpdateCamera();
         onComplete?.Invoke();
     }
 
-    // ---------- ¹¤¾ß·½·¨ ----------
+    // ---------- å·¥å…·æ–¹æ³• ----------
     private void SyncAnglesFromTransform()
     {
         Vector3 pivot = GetPivotPosition();
@@ -366,7 +366,7 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
         baseV = v;
     }
 
-    // ---------- ¸üĞÂÉãÏñ»ú£¨¹ìµÀÄ£Ê½£© ----------
+    // ---------- æ›´æ–°æ‘„åƒæœºï¼ˆè½¨é“æ¨¡å¼ï¼‰ ----------
     private void UpdateCamera()
     {
         Vector3 pivot = currentPivot;
@@ -413,7 +413,7 @@ public class OrbitCameraWithMouseHover : MonoBehaviour
             return Vector3.zero;
     }
 
-    // ---------- µ÷ÊÔ¿ÉÊÓ»¯ ----------
+    // ---------- è°ƒè¯•å¯è§†åŒ– ----------
     private void OnDrawGizmosSelected()
     {
         Vector3 pivot = GetPivotPosition();

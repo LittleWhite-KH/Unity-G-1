@@ -3,14 +3,14 @@ using UnityEngine.InputSystem;
 
 public class MouseLook : MonoBehaviour
 {
-    [Header("ÁéÃô¶È")]
+    [Header("çµæ•åº¦")]
     public float mouseSensitivity = 75f;
 
-    [Header("Ë®Æ½»º¶¯£¨Æ½»¬£©")]
+    [Header("æ°´å¹³ç¼“åŠ¨ï¼ˆå¹³æ»‘ï¼‰")]
     public float horizontalSmoothTime = 0.005f;
     private float mouseXVelocity = 0f;
 
-    [Header("´¹Ö±×èÄá£¨¸©ÑöÏÞÖÆ£©")]
+    [Header("åž‚ç›´é˜»å°¼ï¼ˆä¿¯ä»°é™åˆ¶ï¼‰")]
     public float dampStartAngle = 60f;
     public float dampMaxAngle = 80f;
 
@@ -25,11 +25,11 @@ public class MouseLook : MonoBehaviour
 
         if (cameraTransform == null)
         {
-            Debug.LogError("MouseLook: cameraTransform Î´¸³Öµ£¡");
+            Debug.LogError("MouseLook: cameraTransform æœªèµ‹å€¼ï¼");
             return;
         }
 
-        // ³õÊ¼Ðý×ªÎªË®Æ½ 0¡ã£¬¸©Ñö 0¡ã£¨¿É¸ù¾ÝÐèÒª×ÔÐÐµ÷Õû£©
+        // åˆå§‹æ—‹è½¬ä¸ºæ°´å¹³ 0Â°ï¼Œä¿¯ä»° 0Â°ï¼ˆå¯æ ¹æ®éœ€è¦è‡ªè¡Œè°ƒæ•´ï¼‰
         transform.rotation = Quaternion.identity;
         xRotation = 0f;
         cameraTransform.localRotation = Quaternion.identity;
@@ -39,7 +39,7 @@ public class MouseLook : MonoBehaviour
     {
         if (!canControl || cameraTransform == null) return;
 
-        // ---------- ¶ÁÈ¡Êó±êÊäÈë ----------
+        // ---------- è¯»å–é¼ æ ‡è¾“å…¥ ----------
         float rawMouseX = 0f, rawMouseY = 0f;
         if (Mouse.current != null)
         {
@@ -53,13 +53,13 @@ public class MouseLook : MonoBehaviour
             rawMouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
         }
 
-        // ---------- Ë®Æ½Ðý×ª£¨´ø»º¶¯£© ----------
+        // ---------- æ°´å¹³æ—‹è½¬ï¼ˆå¸¦ç¼“åŠ¨ï¼‰ ----------
         float targetYaw = transform.eulerAngles.y + rawMouseX;
         float currentYaw = transform.eulerAngles.y;
         float newYaw = Mathf.SmoothDampAngle(currentYaw, targetYaw, ref mouseXVelocity, horizontalSmoothTime);
         transform.rotation = Quaternion.Euler(0f, newYaw, 0f);
 
-        // ---------- ´¹Ö±Ðý×ª£¨´ø×èÄá£© ----------
+        // ---------- åž‚ç›´æ—‹è½¬ï¼ˆå¸¦é˜»å°¼ï¼‰ ----------
         float absAngle = Mathf.Abs(xRotation);
         bool isMovingOutward = false;
         if (xRotation >= 0f && rawMouseY < 0f) isMovingOutward = true;

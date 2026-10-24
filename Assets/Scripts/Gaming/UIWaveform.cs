@@ -4,14 +4,14 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CanvasRenderer))]
 public class UIWaveform : MaskableGraphic
 {
-    [Header("²¨ĞÎ¾«¶È")]
+    [Header("æ³¢å½¢ç²¾åº¦")]
     [Range(10, 500)]
     public int pointCount = 150;
 
-    [Header("ÏßÌõ")]
+    [Header("çº¿æ¡")]
     public float lineWidth = 3f;
 
-    [Header("ÕûÌåÇ¿¶È")]
+    [Header("æ•´ä½“å¼ºåº¦")]
     [Range(0f, 1f)]
     public float intensity = 0.5f;
 
@@ -19,17 +19,17 @@ public class UIWaveform : MaskableGraphic
 
     private float currentIntensity;
 
-    [Header("»ù´¡²¨ĞÎ")]
+    [Header("åŸºç¡€æ³¢å½¢")]
     public float amplitude = 40f;
     public float frequency = 3f;
     public float waveSpeed = 2f;
 
-    [Header("Ëæ»ú²¨¶¯")]
+    [Header("éšæœºæ³¢åŠ¨")]
     public float randomStrength = 30f;
     public float randomFrequency = 5f;
     public float randomSpeed = 1f;
 
-    [Header("Ï¸½ÚÔëÉù")]
+    [Header("ç»†èŠ‚å™ªå£°")]
     public float detailStrength = 10f;
     public float detailFrequency = 20f;
     public float detailSpeed = 3f;
@@ -40,7 +40,7 @@ public class UIWaveform : MaskableGraphic
 
         currentIntensity = intensity;
 
-        // ²»ĞèÒª½ÓÊÕÊó±êµã»÷
+        // ä¸éœ€è¦æ¥æ”¶é¼ æ ‡ç‚¹å‡»
         raycastTarget = false;
     }
 
@@ -52,7 +52,7 @@ public class UIWaveform : MaskableGraphic
             Time.deltaTime * intensitySmoothSpeed
         );
 
-        // Í¨Öª Unity ÖØĞÂÉú³É UI Mesh
+        // é€šçŸ¥ Unity é‡æ–°ç”Ÿæˆ UI Mesh
         SetVerticesDirty();
     }
 
@@ -71,7 +71,7 @@ public class UIWaveform : MaskableGraphic
         {
             float t = i / (float)(pointCount - 1);
 
-            // X ×ø±ê
+            // X åæ ‡
             float x = Mathf.Lerp(
                 rect.xMin,
                 rect.xMax,
@@ -79,7 +79,7 @@ public class UIWaveform : MaskableGraphic
             );
 
             // =========================
-            // »ù´¡²¨ĞÎ
+            // åŸºç¡€æ³¢å½¢
             // =========================
 
             float sine =
@@ -89,7 +89,7 @@ public class UIWaveform : MaskableGraphic
                 );
 
             // =========================
-            // ´ó·¶Î§Ëæ»ú±ä»¯
+            // å¤§èŒƒå›´éšæœºå˜åŒ–
             // =========================
 
             float noise =
@@ -101,7 +101,7 @@ public class UIWaveform : MaskableGraphic
             noise = noise * 2f - 1f;
 
             // =========================
-            // Ğ¡·¶Î§Ëæ»úÏ¸½Ú
+            // å°èŒƒå›´éšæœºç»†èŠ‚
             // =========================
 
             float detail =
@@ -113,7 +113,7 @@ public class UIWaveform : MaskableGraphic
             detail = detail * 2f - 1f;
 
             // =========================
-            // ×îÖÕ¸ß¶È
+            // æœ€ç»ˆé«˜åº¦
             // =========================
 
             float y =
@@ -121,7 +121,7 @@ public class UIWaveform : MaskableGraphic
                 + noise * randomStrength
                 + detail * detailStrength;
 
-            // ¸ù¾İÇ¿¶È¿ØÖÆÕûÌå²¨¶¯
+            // æ ¹æ®å¼ºåº¦æ§åˆ¶æ•´ä½“æ³¢åŠ¨
             y *= currentIntensity;
 
             Vector2 point = new Vector2(
@@ -144,7 +144,7 @@ public class UIWaveform : MaskableGraphic
     }
 
     /// <summary>
-    /// »æÖÆÒ»¶Î UI ÏßÌõ
+    /// ç»˜åˆ¶ä¸€æ®µ UI çº¿æ¡
     /// </summary>
     private void AddLine(
         VertexHelper vh,
@@ -193,7 +193,7 @@ public class UIWaveform : MaskableGraphic
     }
 
     // =========================
-    // ¶ÔÍâ½Ó¿Ú
+    // å¯¹å¤–æ¥å£
     // =========================
 
     public void SetIntensity(float value)

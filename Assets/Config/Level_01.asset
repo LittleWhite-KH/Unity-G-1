@@ -1,0 +1,232 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0e3ea8cf439b444daaeb9fd29b803d5, type: 3}
+  m_Name: Level_01
+  m_EditorClassIdentifier: Assembly-CSharp::LevelDefinition
+  levelId: level_01_maze
+  displayName: LEVEL 1
+  phases:
+  - id: intro
+    kind: 0
+    levelTitle: LEVEL 1
+    objective: LOOK AROUND
+    objectiveWhenNear: 
+    targetIds: []
+    waypointId: 
+    mapNodeId: 
+    markVisitedOnComplete: 0
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: charge_tomb
+    kind: 1
+    levelTitle: LEVEL 1
+    objective: FIND THE TOMB
+    objectiveWhenNear: 
+    targetIds:
+    - tomb
+    waypointId: tomb
+    mapNodeId: tomb
+    markVisitedOnComplete: 1
+    sanZeroDistance: 48
+    sanFullDistance: 5
+    chargeDistance: 6
+    angleThreshold: 8
+    chargeDuration: 5
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: reveal_map
+    kind: 2
+    levelTitle: LEVEL 1
+    objective: OPEN THE MAP (M)
+    objectiveWhenNear: 
+    targetIds: []
+    waypointId: table
+    mapNodeId: 
+    markVisitedOnComplete: 0
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 1
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: charge_table
+    kind: 1
+    levelTitle: LEVEL 1
+    objective: FIND THE TABLE
+    objectiveWhenNear: 
+    targetIds:
+    - table
+    waypointId: table
+    mapNodeId: table
+    markVisitedOnComplete: 1
+    sanZeroDistance: 54
+    sanFullDistance: 5
+    chargeDistance: 6
+    angleThreshold: 8
+    chargeDuration: 5
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: door_trigger
+    kind: 3
+    levelTitle: LEVEL 1
+    objective: GO TO THE SPECIAL DOOR
+    objectiveWhenNear: THE DOOR IS SEALED
+    targetIds:
+    - door
+    waypointId: door
+    mapNodeId: door
+    markVisitedOnComplete: 1
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: find_keys
+    kind: 4
+    levelTitle: LEVEL 1
+    objective: FIND 2 KEYS
+    objectiveWhenNear: PRESS E - TAKE KEY
+    targetIds:
+    - key_a
+    - key_b
+    waypointId: 
+    mapNodeId: 
+    markVisitedOnComplete: 0
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 3.5
+    requiredCount: 2
+    showKeyCounter: 1
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 1
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: open_door
+    kind: 5
+    levelTitle: LEVEL 1
+    objective: OPEN THE SPECIAL DOOR
+    objectiveWhenNear: PRESS E - OPEN THE DOOR
+    targetIds:
+    - door
+    waypointId: door
+    mapNodeId: door
+    markVisitedOnComplete: 1
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 4
+    requiredCount: 2
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 0
+  - id: ending
+    kind: 6
+    levelTitle: LEVEL 1
+    objective: REACH THE MAINFRAME
+    objectiveWhenNear: 
+    targetIds:
+    - ending
+    waypointId: ending
+    mapNodeId: ending
+    markVisitedOnComplete: 1
+    sanZeroDistance: -1
+    sanFullDistance: -1
+    chargeDistance: -1
+    angleThreshold: -1
+    chargeDuration: -1
+    requireClick: 0
+    playImpactOnComplete: 1
+    triggerDistance: 3
+    requiredCount: -1
+    showKeyCounter: 0
+    unlockMapOnEnter: 0
+    unlockTargetsOnEnter: 0
+    discoverTargetsOnEnter: 0
+    holdAfterReveal: 1
+    waitForMapCycle: 1
+    sanAfterStable: 40
+    fadeOutOnComplete: 1

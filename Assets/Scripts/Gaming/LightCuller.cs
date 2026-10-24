@@ -4,15 +4,15 @@ using System.Collections.Generic;
 
 public class LightCuller : MonoBehaviour
 {
-    [Header("µÆ¹âÌŞ³ıÉèÖÃ")]
-    public float cullDistance = 20f;          // µÆ¹âÍêÈ«ÏûÊ§µÄ¾àÀë
-    public float fadeStartDistance = 15f;      // ¿ªÊ¼µ­³öµÄ¾àÀë£¨´Ó¸Ã¾àÀëµ½ cullDistance Ö®¼ä¹ı¶É£©
-    public float fadeDuration = 0.5f;          // Ã¿¸öµÆ¹âµ­Èëµ­³ö³ÖĞøÊ±¼ä£¨Ãë£©
-    public float checkInterval = 0.2f;         // ¼ì²â¼ä¸ô
+    [Header("ç¯å…‰å‰”é™¤è®¾ç½®")]
+    public float cullDistance = 20f;          // ç¯å…‰å®Œå…¨æ¶ˆå¤±çš„è·ç¦»
+    public float fadeStartDistance = 15f;      // å¼€å§‹æ·¡å‡ºçš„è·ç¦»ï¼ˆä»è¯¥è·ç¦»åˆ° cullDistance ä¹‹é—´è¿‡æ¸¡ï¼‰
+    public float fadeDuration = 0.5f;          // æ¯ä¸ªç¯å…‰æ·¡å…¥æ·¡å‡ºæŒç»­æ—¶é—´ï¼ˆç§’ï¼‰
+    public float checkInterval = 0.2f;         // æ£€æµ‹é—´éš”
 
-    [Header("×Ô¶¯×¢²á")]
+    [Header("è‡ªåŠ¨æ³¨å†Œ")]
     public bool autoFindObjects = true;
-    public LayerMask includeLayers = ~0;       // ¹ÜÀíµÄ²ã£¨Ä¬ÈÏËùÓĞ²ã£©
+    public LayerMask includeLayers = ~0;       // ç®¡ç†çš„å±‚ï¼ˆé»˜è®¤æ‰€æœ‰å±‚ï¼‰
 
     private Transform player;
     private List<Light> lights = new List<Light>();
@@ -139,8 +139,8 @@ public class LightCuller : MonoBehaviour
         currentWeights[light] = weight;
     }
 
-    // ¶¯Ì¬Ìí¼Ó/ÒÆ³ıµÆ¹â
-    public void AddLight(Light light) { /* ... ¿É²ÎÕÕÖ®Ç°µÄÊµÏÖ */ }
+    // åŠ¨æ€æ·»åŠ /ç§»é™¤ç¯å…‰
+    public void AddLight(Light light) { /* ... å¯å‚ç…§ä¹‹å‰çš„å®ç° */ }
     public void RemoveLight(Light light) { /* ... */ }
     public void SetCullDistance(float newCull, float newFadeStart) { /* ... */ }
 }

@@ -74,6 +74,9 @@ public class MapPanel : MonoBehaviour
     [Header("点位标记")]
     public RectTransform waypointMarker;
 
+    [Tooltip("地图打开时隐藏的 HUD 组（例如右上角 LEVEL / FIND THE ... 文字，避免和地图顶栏重叠）")]
+    public CanvasGroup hideWhileOpen;
+
     [Header("调试")]
     public bool logState = false;
 
@@ -269,6 +272,9 @@ public class MapPanel : MonoBehaviour
         }
 
         if (contentRoot != null) contentRoot.SetActive(open);
+
+        // 地图打开时隐藏右上角的 HUD 关卡文字，避免从地图顶栏下方露出来
+        if (hideWhileOpen != null) hideWhileOpen.alpha = open ? 0f : 1f;
 
         ApplyCursorAndLook(open);
     }

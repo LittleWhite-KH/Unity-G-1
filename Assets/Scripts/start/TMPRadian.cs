@@ -7,20 +7,20 @@ public class TMPRadian : MonoBehaviour
 {
     [Header("Arc Settings")]
 
-    [Tooltip("ÕûÌåÍäÇú½Ç¶È")]
+    [Tooltip("æ•´ä½“å¼¯æ›²è§’åº¦")]
     [Range(-180f, 180f)]
     public float arcAngle = 60f;
 
-    [Tooltip("Ô²»¡°ë¾¶£¬Ô½´óÔ½Æ½»º")]
+    [Tooltip("åœ†å¼§åŠå¾„ï¼Œè¶Šå¤§è¶Šå¹³ç¼“")]
     [Min(1f)]
     public float radius = 500f;
 
-    [Tooltip("×Ö·ûÊÇ·ñ¸úËæ XZ Ô²»¡Ğı×ª")]
+    [Tooltip("å­—ç¬¦æ˜¯å¦è·Ÿéš XZ åœ†å¼§æ—‹è½¬")]
     public bool rotateCharacter = true;
 
     [Header("Offset")]
 
-    [Tooltip("X / Z ·½ÏòÆ«ÒÆ")]
+    [Tooltip("X / Z æ–¹å‘åç§»")]
     public Vector2 offset = Vector2.zero;
 
     private TMP_Text tmpText;
@@ -71,7 +71,7 @@ public class TMPRadian : MonoBehaviour
         bool foundVisibleCharacter = false;
 
         // ---------------------------------
-        // »ñÈ¡Õû¶ÎÎÄ×ÖµÄ X ·¶Î§
+        // è·å–æ•´æ®µæ–‡å­—çš„ X èŒƒå›´
         // ---------------------------------
         for (int i = 0; i < textInfo.characterCount; i++)
         {
@@ -108,7 +108,7 @@ public class TMPRadian : MonoBehaviour
             (minX + maxX) * 0.5f;
 
         // ---------------------------------
-        // Öğ×Ö·ûĞŞ¸Ä
+        // é€å­—ç¬¦ä¿®æ”¹
         // ---------------------------------
         for (int i = 0; i < textInfo.characterCount; i++)
         {
@@ -127,7 +127,7 @@ public class TMPRadian : MonoBehaviour
             Vector3[] vertices =
                 textInfo.meshInfo[materialIndex].vertices;
 
-            // µ±Ç°×Ö·ûÖĞĞÄ
+            // å½“å‰å­—ç¬¦ä¸­å¿ƒ
             Vector3 charCenter =
                 (vertices[vertexIndex] +
                  vertices[vertexIndex + 2]) * 0.5f;
@@ -144,7 +144,7 @@ public class TMPRadian : MonoBehaviour
             float centeredPosition =
                 normalizedPosition - 0.5f;
 
-            // µ±Ç°×Ö·ûËù´¦Ô²»¡½Ç¶È
+            // å½“å‰å­—ç¬¦æ‰€å¤„åœ†å¼§è§’åº¦
             float angle =
                 centeredPosition * arcAngle;
 
@@ -152,7 +152,7 @@ public class TMPRadian : MonoBehaviour
                 angle * Mathf.Deg2Rad;
 
             // =================================
-            // X-Z Ô²»¡
+            // X-Z åœ†å¼§
             // =================================
 
             float arcX =
@@ -162,7 +162,7 @@ public class TMPRadian : MonoBehaviour
                 radius -
                 Mathf.Cos(rad) * radius;
 
-            // Y ±£³ÖÔ­Öµ
+            // Y ä¿æŒåŸå€¼
             Vector3 targetCenter =
                 new Vector3(
                     originalCenterX + arcX + offset.x,
@@ -171,7 +171,7 @@ public class TMPRadian : MonoBehaviour
                 );
 
             // ---------------------------------
-            // ±£´æ×Ö·û×Ô¼ºµÄ¶¥µãĞÎ×´
+            // ä¿å­˜å­—ç¬¦è‡ªå·±çš„é¡¶ç‚¹å½¢çŠ¶
             // ---------------------------------
             Vector3 bottomLeft =
                 vertices[vertexIndex] -
@@ -193,8 +193,8 @@ public class TMPRadian : MonoBehaviour
                 Quaternion.identity;
 
             // ---------------------------------
-            // XZ Æ½ÃæµÄÇĞÏßĞı×ª
-            // Òò´ËÈÆ Y ÖáĞı×ª
+            // XZ å¹³é¢çš„åˆ‡çº¿æ—‹è½¬
+            // å› æ­¤ç»• Y è½´æ—‹è½¬
             // ---------------------------------
             if (rotateCharacter)
             {
