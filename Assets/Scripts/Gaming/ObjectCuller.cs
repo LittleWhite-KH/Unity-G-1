@@ -18,6 +18,8 @@ public class ObjectCuller : MonoBehaviour
     private List<Collider> colliders = new List<Collider>();
     private float sqrCullDistance;
 
+    private bool initialized;
+
     void Start()
     {
         player = transform;
@@ -29,13 +31,13 @@ public class ObjectCuller : MonoBehaviour
             foreach (var rend in allRenderers)
             {
                 // 排除玩家自身以及不在指定层的物体
-                if (((1 << rend.gameObject.layer) & includeLayers) != 0 && rend.transform != player)
+                if (((1 << rend.gameObject.layer) & includeLayers) != 0 && rend.transform != player && rend.enabled)
                 {
                     renderers.Add(rend);
                     if (cullColliders)
                     {
                         Collider col = rend.GetComponent<Collider>();
-                        if (col != null) colliders.Add(col);
+                        if (col != null && col.enabled) colliders.Add(col);
                     }
                 }
             }
@@ -45,8 +47,23 @@ public class ObjectCuller : MonoBehaviour
             Debug.LogWarning("ObjectCuller: 自动查找未启用，请在Inspector手动添加Renderer列表。");
         }
 
+        initialized = true;
         UpdateCulling();
         StartCoroutine(CullingLoop());
+    }
+
+    private void OnEnable()
+    {
+        if (initialized) StartCoroutine(CullingLoop());
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        foreach (Renderer rend in renderers)
+            if (rend != null) rend.enabled = true;
+        foreach (Collider col in colliders)
+            if (col != null) col.enabled = true;
     }
 
     IEnumerator CullingLoop()

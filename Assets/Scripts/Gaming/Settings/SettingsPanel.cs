@@ -39,14 +39,34 @@ public class SettingsPanel : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void Bootstrap()
     {
-        SceneManager.sceneLoaded += (scene, mode) => Ensure(scene);
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        SceneManager.sceneLoaded += OnSceneLoaded;
         Ensure(SceneManager.GetActiveScene());
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Ensure(scene);
     }
 
     private static void Ensure(Scene scene)
     {
-        if (scene.name == "Start") return;
-        if (FindFirstObjectByType<SettingsPanel>() != null) return;
+        SettingsPanel existing = FindFirstObjectByType<SettingsPanel>();
+        if (scene.name == "Start")
+        {
+            if (existing != null) Destroy(existing.gameObject);
+            instance = null;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return;
+        }
+        if (existing != null)
+        {
+            existing.SetOpen(false);
+            existing.PlayerFind();
+            existing.enabled = true;
+            return;
+        }
         GameObject go = new GameObject("SettingsPanel");
         DontDestroyOnLoad(go);
         go.AddComponent<SettingsPanel>();

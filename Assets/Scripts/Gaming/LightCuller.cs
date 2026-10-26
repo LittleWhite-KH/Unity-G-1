@@ -28,6 +28,8 @@ public class LightCuller : MonoBehaviour
     private Dictionary<Light, float> currentWeights = new Dictionary<Light, float>();
     private Dictionary<Light, Coroutine> fadeCoroutines = new Dictionary<Light, Coroutine>();
 
+    private bool initialized;
+
     void Start()
     {
         player = transform;
@@ -37,7 +39,7 @@ public class LightCuller : MonoBehaviour
             Light[] allLights = FindObjectsOfType<Light>();
             foreach (var light in allLights)
             {
-                if (((1 << light.gameObject.layer) & includeLayers) == 0)
+                if (!light.enabled || ((1 << light.gameObject.layer) & includeLayers) == 0)
                     continue;
 
                 lights.Add(light);
@@ -53,8 +55,29 @@ public class LightCuller : MonoBehaviour
             }
         }
 
+        initialized = true;
         UpdateCulling();
         StartCoroutine(CullingLoop());
+    }
+
+    private void OnEnable()
+    {
+        if (initialized) StartCoroutine(CullingLoop());
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        fadeCoroutines.Clear();
+        foreach (var pair in originalValues)
+        {
+            if (pair.Key == null) continue;
+            pair.Key.intensity = pair.Value.intensity;
+            pair.Key.range = pair.Value.range;
+            if (pair.Key.type == LightType.Spot) pair.Key.spotAngle = pair.Value.spotAngle;
+            pair.Key.enabled = pair.Value.enabled;
+            currentWeights[pair.Key] = 1f;
+        }
     }
 
     IEnumerator CullingLoop()

@@ -182,6 +182,24 @@ public class MapPanel : MonoBehaviour
         if (logState) Debug.Log("[MapPanel] 关闭");
     }
 
+    public void CloseImmediate()
+    {
+        if (routine != null) StopCoroutine(routine);
+        routine = null;
+        IsOpen = false;
+        ApplyOpenState(false);
+        NotifySidebar();
+    }
+
+    private void OnDisable()
+    {
+        // A hidden canvas must not leave the player's components disabled.
+        StopAllCoroutines();
+        routine = null;
+        IsOpen = false;
+        ApplyCursorAndLook(false);
+    }
+
     public void Toggle()
     {
         if (IsOpen) Close();

@@ -1,6 +1,8 @@
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 /// <summary>把场景里的相机渲染成 PNG，用来在编辑模式看画面（不依赖窗口截图）。</summary>
 public static class DshCapture
@@ -36,7 +38,16 @@ public static class DshCapture
         RenderTextureDescriptor prevDesc = cam.targetTexture != null ? default : default;
 
         cam.targetTexture = rt;
-        cam.Render();
+        if (GraphicsSettings.currentRenderPipeline == null)
+        {
+            cam.Render();
+        }
+        else
+        {
+            // URP needs an explicit render request; Camera.Render is not guaranteed to paint the RT.
+            var request = new UniversalRenderPipeline.SingleCameraRequest { destination = rt };
+            RenderPipeline.SubmitRenderRequest(cam, request);
+        }
 
         RenderTexture.active = rt;
         Texture2D tex = new Texture2D(W, H, TextureFormat.RGB24, false);

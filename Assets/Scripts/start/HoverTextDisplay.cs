@@ -55,6 +55,12 @@ public class HoverTextDisplay : MonoBehaviour
     [Tooltip("每一帧停留的时间（秒）")]
     [SerializeField] private float loadingFrameInterval = 1f;
 
+    [Header("Default TV prompt")]
+    [SerializeField] private bool showDefaultPrompt = true;
+    [SerializeField] private int defaultItemIndex = 0;
+    private HoverItem defaultItem;
+    private bool defaultPromptVisible;
+
     // 内部状态
     private GameObject currentTarget;
     private TextMeshProUGUI currentText;
@@ -105,8 +111,18 @@ public class HoverTextDisplay : MonoBehaviour
         }
     }
 
+    private void UpdateDefaultPrompt(bool visible)
+    {
+        if (defaultItem == null || defaultPromptVisible == visible) return;
+        defaultPromptVisible = visible;
+        if (visible) FadeInText(defaultItem.secondaryText);
+        else if (!activatedItems.Contains(defaultItem)) FadeOutText(defaultItem.secondaryText);
+    }
+
     void Update()
     {
+        if (defaultItem == null && showDefaultPrompt && defaultItemIndex >= 0 && defaultItemIndex < items.Count)
+            defaultItem = items[defaultItemIndex];
         if (Mouse.current == null || Camera.main == null) return;
 
         Vector2 mousePos = Mouse.current.position.ReadValue();
@@ -120,9 +136,14 @@ public class HoverTextDisplay : MonoBehaviour
             hoveredItem = items.Find(i => i.target == hitObj);
         }
 
+        // Keep the start label and its SPACE instruction visible at rest.
+        bool hasHover = hoveredItem != null;
+        if (!hasHover) hoveredItem = defaultItem;
+        UpdateDefaultPrompt(hoveredItem == defaultItem);
+
         // 1. 鼠标左键按下：激活该按钮，显示第二批文字与读条文字。
         if (Mouse.current.leftButton.wasPressedThisFrame &&
-            hoveredItem != null &&
+            hasHover && hoveredItem != null &&
             hoveredItem.enableClick &&
             !activatedItems.Contains(hoveredItem))
         {

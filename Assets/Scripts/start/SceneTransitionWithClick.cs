@@ -38,6 +38,7 @@ public class SceneTransitionWithClick : MonoBehaviour
         imageObj.transform.SetParent(canvasObj.transform);
 
         fadeImage = imageObj.AddComponent<UnityEngine.UI.Image>();
+        fadeImage.raycastTarget = false;
         fadeImage.color = new Color(1, 1, 1, 0); // 全白，但完全透明
 
         // 拉伸到全屏
@@ -51,7 +52,7 @@ public class SceneTransitionWithClick : MonoBehaviour
     private void Update()
     {
         // 1. 检测鼠标左键点击（使用新输入系统）
-        if (!objectClicked && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        if (!objectClicked && Camera.main != null && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -65,7 +66,7 @@ public class SceneTransitionWithClick : MonoBehaviour
         }
 
         // 2. 检测空格键按下（必须已点击目标且未开始过渡）
-        if (objectClicked && !transitionStarted && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (!transitionStarted && Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
         {
             transitionStarted = true;
             StartCoroutine(FadeToWhiteAndLoad());
@@ -77,7 +78,7 @@ public class SceneTransitionWithClick : MonoBehaviour
         float alpha = 0f;
         while (alpha < 1f)
         {
-            alpha += fadeSpeed * Time.deltaTime;
+            alpha += Mathf.Max(0.01f, fadeSpeed) * Time.unscaledDeltaTime;
             fadeImage.color = new Color(1, 1, 1, alpha);
             yield return null;
         }

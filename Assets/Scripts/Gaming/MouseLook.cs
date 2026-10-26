@@ -85,6 +85,13 @@ public class MouseLook : MonoBehaviour
         }
     }
 
+    public void ResetLook()
+    {
+        xRotation = 0f;
+        mouseXVelocity = 0f;
+        if (cameraTransform != null) cameraTransform.localRotation = Quaternion.identity;
+    }
+
     public void SetControlEnabled(bool enabled)
     {
         canControl = enabled;

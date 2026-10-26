@@ -235,6 +235,13 @@ public class RevealRunner : PhaseRunnerBase
             return;
         }
 
+        // Record an early map open even while the HUD reveal hold is running.
+        if (ctx.Map != null && ctx.Map.IsOpen && !opened)
+        {
+            opened = true;
+            if (ctx.MapHintRoot != null) ctx.MapHintRoot.SetActive(false);
+        }
+
         elapsed += dt;
         if (elapsed < def.holdAfterReveal)
         {
@@ -769,6 +776,12 @@ public class SubmitRunner : PhaseRunnerBase
                 m.SetColor("_EmissionColor", new Color(0.30f, 0.55f, 0.95f) * 0.85f);
             }
         }
+
+        TvPortal portal = Object.FindAnyObjectByType<TvPortal>();
+        if (portal != null)
+        {
+            portal.SetScreenOn(true);
+        }
     }
 }
 
@@ -847,6 +860,14 @@ public class ScreenDoorRunner : PhaseRunnerBase
                 cam.rotation = Quaternion.Slerp(startRot, endRot, k);
                 yield return null;
             }
+        }
+
+        TvPortal portal = Object.FindAnyObjectByType<TvPortal>();
+        if (portal != null)
+        {
+            Log("take the screen off, then enter the TV");
+            portal.RemoveScreen();
+            yield break;
         }
 
         yield return FlashWhite(0.3f);

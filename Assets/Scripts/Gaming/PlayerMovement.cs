@@ -96,6 +96,13 @@ public class PlayerMovement : MonoBehaviour
         controller.Move(delta);
     }
 
+    public void ResetMotion()
+    {
+        currentSpeed = 0f;
+        currentVelocity = Vector3.zero;
+        verticalVelocity = 0f;
+    }
+
     public void SetMoveEnabled(bool enabled)
     {
         canMove = enabled;
