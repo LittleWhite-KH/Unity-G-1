@@ -71,7 +71,7 @@ MonoBehaviour:
   - id: reveal_map
     kind: 2
     levelTitle: LEVEL 1
-    objective: OPEN THE MAP (M)
+    objective: OPEN THE MAP [M]  ·  SETTINGS [TAB]
     objectiveWhenNear: 
     targetIds: []
     waypointId: table
@@ -121,16 +121,16 @@ MonoBehaviour:
     waitForMapCycle: 1
     sanAfterStable: 40
     fadeOutOnComplete: 0
-  - id: door_trigger
+  - id: tv_offline
     kind: 3
     levelTitle: LEVEL 1
-    objective: GO TO THE SPECIAL DOOR
-    objectiveWhenNear: THE DOOR IS SEALED
+    objective: GO TO THE TV
+    objectiveWhenNear: NO SIGNAL - INSERT FLOPPY + DISC
     targetIds:
-    - door
-    waypointId: door
-    mapNodeId: door
-    markVisitedOnComplete: 1
+    - tv
+    waypointId: tv
+    mapNodeId: 
+    markVisitedOnComplete: 0
     sanZeroDistance: -1
     sanFullDistance: -1
     chargeDistance: -1
@@ -151,8 +151,8 @@ MonoBehaviour:
   - id: find_keys
     kind: 4
     levelTitle: LEVEL 1
-    objective: FIND 2 KEYS
-    objectiveWhenNear: PRESS E - TAKE KEY
+    objective: FIND FLOPPY + DISC
+    objectiveWhenNear: PRESS E - TAKE IT
     targetIds:
     - key_a
     - key_b
@@ -176,15 +176,15 @@ MonoBehaviour:
     waitForMapCycle: 1
     sanAfterStable: 40
     fadeOutOnComplete: 0
-  - id: open_door
-    kind: 5
+  - id: tv_unlock
+    kind: 7
     levelTitle: LEVEL 1
-    objective: OPEN THE SPECIAL DOOR
-    objectiveWhenNear: PRESS E - OPEN THE DOOR
+    objective: RETURN TO THE TV
+    objectiveWhenNear: PRESS E - INSERT FLOPPY + DISC
     targetIds:
-    - door
-    waypointId: door
-    mapNodeId: door
+    - tv
+    waypointId: tv
+    mapNodeId: tv
     markVisitedOnComplete: 1
     sanZeroDistance: -1
     sanFullDistance: -1
@@ -193,9 +193,9 @@ MonoBehaviour:
     chargeDuration: -1
     requireClick: 0
     playImpactOnComplete: 1
-    triggerDistance: 4
+    triggerDistance: 3.5
     requiredCount: 2
-    showKeyCounter: 0
+    showKeyCounter: 1
     unlockMapOnEnter: 0
     unlockTargetsOnEnter: 0
     discoverTargetsOnEnter: 0
@@ -203,15 +203,15 @@ MonoBehaviour:
     waitForMapCycle: 1
     sanAfterStable: 40
     fadeOutOnComplete: 0
-  - id: ending
-    kind: 6
+  - id: tv_enter
+    kind: 8
     levelTitle: LEVEL 1
-    objective: REACH THE MAINFRAME
-    objectiveWhenNear: 
+    objective: THE SCREEN IS ON
+    objectiveWhenNear: PRESS E - ENTER THE SCREEN
     targetIds:
-    - ending
-    waypointId: ending
-    mapNodeId: ending
+    - tv
+    waypointId: tv
+    mapNodeId: tv
     markVisitedOnComplete: 1
     sanZeroDistance: -1
     sanFullDistance: -1
@@ -220,7 +220,7 @@ MonoBehaviour:
     chargeDuration: -1
     requireClick: 0
     playImpactOnComplete: 1
-    triggerDistance: 3
+    triggerDistance: 3.5
     requiredCount: -1
     showKeyCounter: 0
     unlockMapOnEnter: 0
@@ -229,4 +229,4 @@ MonoBehaviour:
     holdAfterReveal: 1
     waitForMapCycle: 1
     sanAfterStable: 40
-    fadeOutOnComplete: 1
+    fadeOutOnComplete: 0

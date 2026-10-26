@@ -10,7 +10,9 @@ public enum PhaseKind
     Trigger = 3,
     PickupSet = 4,
     Door = 5,
-    Ending = 6
+    Ending = 6,
+    Submit = 7,
+    ScreenDoor = 8
 }
 
 /// <summary>

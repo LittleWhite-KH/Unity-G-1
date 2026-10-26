@@ -4,7 +4,8 @@ using UnityEngine.InputSystem;
 public class MouseLook : MonoBehaviour
 {
     [Header("灵敏度")]
-    public float mouseSensitivity = 75f;
+    [Tooltip("基础灵敏度（度/像素）。设置面板里再乘 GameSettings.Sensitivity")]
+    public float mouseSensitivity = 0.12f;
 
     [Header("水平缓动（平滑）")]
     public float horizontalSmoothTime = 0.005f;
@@ -19,8 +20,9 @@ public class MouseLook : MonoBehaviour
 
     private float xRotation = 0f;
 
-    void Start()
+    private void Start()
     {
+        GameSettings.Load();
         Cursor.lockState = CursorLockMode.Locked;
 
         if (cameraTransform == null)
@@ -29,37 +31,32 @@ public class MouseLook : MonoBehaviour
             return;
         }
 
-        // 初始旋转为水平 0°，俯仰 0°（可根据需要自行调整）
-        transform.rotation = Quaternion.identity;
+        // 保留场景里配置的出生朝向（不要强制 identity）
         xRotation = 0f;
         cameraTransform.localRotation = Quaternion.identity;
+        ApplyFov();
     }
 
-    void Update()
+    private void Update()
     {
         if (!canControl || cameraTransform == null) return;
 
-        // ---------- 读取鼠标输入 ----------
+        ApplyFov();
+
         float rawMouseX = 0f, rawMouseY = 0f;
         if (Mouse.current != null)
         {
             Vector2 delta = Mouse.current.delta.ReadValue();
-            rawMouseX = delta.x * mouseSensitivity * Time.deltaTime;
-            rawMouseY = delta.y * mouseSensitivity * Time.deltaTime;
-        }
-        else
-        {
-            rawMouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
-            rawMouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
+            float scale = mouseSensitivity * GameSettings.SensitivityMultiplier;
+            rawMouseX = delta.x * scale;
+            rawMouseY = delta.y * scale * (GameSettings.InvertY ? -1f : 1f);
         }
 
-        // ---------- 水平旋转（带缓动） ----------
         float targetYaw = transform.eulerAngles.y + rawMouseX;
         float currentYaw = transform.eulerAngles.y;
         float newYaw = Mathf.SmoothDampAngle(currentYaw, targetYaw, ref mouseXVelocity, horizontalSmoothTime);
         transform.rotation = Quaternion.Euler(0f, newYaw, 0f);
 
-        // ---------- 垂直旋转（带阻尼） ----------
         float absAngle = Mathf.Abs(xRotation);
         bool isMovingOutward = false;
         if (xRotation >= 0f && rawMouseY < 0f) isMovingOutward = true;
@@ -77,6 +74,15 @@ public class MouseLook : MonoBehaviour
         xRotation = Mathf.Clamp(xRotation, -dampMaxAngle, dampMaxAngle);
 
         cameraTransform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+    }
+
+    private void ApplyFov()
+    {
+        Camera cam = cameraTransform != null ? cameraTransform.GetComponent<Camera>() : null;
+        if (cam != null && !Mathf.Approximately(cam.fieldOfView, GameSettings.Fov))
+        {
+            cam.fieldOfView = Mathf.Lerp(cam.fieldOfView, GameSettings.Fov, 1f - Mathf.Exp(-8f * Time.deltaTime));
+        }
     }
 
     public void SetControlEnabled(bool enabled)

@@ -1,6 +1,9 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>开场：锁操控 → SAN 平稳动画 → 解锁。</summary>
 public class IntroRunner : PhaseRunnerBase
@@ -670,6 +673,238 @@ public class EndingRunner : PhaseRunnerBase
         {
             completed = true;
             Complete();
+        }
+    }
+}
+
+/// <summary>电视插盘：收齐软盘+光盘后回到电视，按 E 插入，电视亮起。</summary>
+public class SubmitRunner : PhaseRunnerBase
+{
+    private GuidanceTarget target;
+    private bool submitted;
+
+    public override Transform ObjectiveTarget => target != null ? target.transform : null;
+
+    public override void Enter(PhaseDefinition def, LevelContext ctx)
+    {
+        base.Enter(def, ctx);
+        target = ResolveTarget();
+        submitted = false;
+
+        if (ctx.Map != null && target != null)
+        {
+            ctx.Map.SetWaypoint(target.transform);
+        }
+
+        Log($"submit target={(target != null ? target.id : "null")} keys={(ctx.State != null ? ctx.State.Count : 0)}");
+    }
+
+    public override void Tick(PhaseDefinition def, LevelContext ctx, float dt)
+    {
+        if (submitted || target == null)
+        {
+            return;
+        }
+
+        bool near = IsNear(target, def.triggerDistance);
+        if (near != wasNear)
+        {
+            wasNear = near;
+            if (!string.IsNullOrEmpty(def.objectiveWhenNear) && ctx.Director != null)
+            {
+                ctx.Director.SetObjective(near ? def.objectiveWhenNear : def.objective);
+            }
+        }
+
+        if (!near || !InteractPressed())
+        {
+            return;
+        }
+
+        int need = def.requiredCount < 0 ? 2 : Mathf.Max(1, def.requiredCount);
+        int have = ctx.State != null ? ctx.State.Count : 0;
+        if (have < need)
+        {
+            Log($"need {need} items, have {have}");
+            return;
+        }
+
+        submitted = true;
+
+        if (ctx.SanDisplay != null)
+        {
+            ctx.SanDisplay.PlayImpact();
+        }
+
+        TurnOnScreen();
+        Log("inserted floppy + disc, screen on");
+        Complete();
+    }
+
+    private bool wasNear;
+
+    private static void TurnOnScreen()
+    {
+        GameObject tv = GameObject.Find("TV_Ending");
+        if (tv == null)
+        {
+            return;
+        }
+
+        foreach (Renderer r in tv.GetComponentsInChildren<Renderer>(true))
+        {
+            if (!r.name.ToLower().Contains("screen"))
+            {
+                continue;
+            }
+
+            foreach (Material m in r.materials)
+            {
+                if (m == null)
+                {
+                    continue;
+                }
+
+                m.EnableKeyword("_EMISSION");
+                m.SetColor("_EmissionColor", new Color(0.30f, 0.55f, 0.95f) * 0.85f);
+            }
+        }
+    }
+}
+
+/// <summary>进入电视：按 E 后相机推进到屏幕前，白闪，加载 Ending 场景。</summary>
+public class ScreenDoorRunner : PhaseRunnerBase
+{
+    private GuidanceTarget target;
+    private bool entering;
+    private bool wasNear;
+
+    public override Transform ObjectiveTarget => target != null ? target.transform : null;
+
+    public override void Enter(PhaseDefinition def, LevelContext ctx)
+    {
+        base.Enter(def, ctx);
+        target = ResolveTarget();
+        entering = false;
+        wasNear = false;
+
+        if (ctx.Map != null && target != null)
+        {
+            ctx.Map.SetWaypoint(target.transform);
+        }
+
+        Log($"screen door target={(target != null ? target.id : "null")}");
+    }
+
+    public override void Tick(PhaseDefinition def, LevelContext ctx, float dt)
+    {
+        if (entering || target == null || ctx.Director == null)
+        {
+            return;
+        }
+
+        bool near = IsNear(target, def.triggerDistance);
+        if (near != wasNear)
+        {
+            wasNear = near;
+            if (!string.IsNullOrEmpty(def.objectiveWhenNear) && ctx.Director != null)
+            {
+                ctx.Director.SetObjective(near ? def.objectiveWhenNear : def.objective);
+            }
+        }
+
+        if (!near || !InteractPressed())
+        {
+            return;
+        }
+
+        entering = true;
+        ctx.Director.StartCoroutine(EnterRoutine(ctx));
+    }
+
+    private IEnumerator EnterRoutine(LevelContext ctx)
+    {
+        SetControl(ctx, false);
+
+        Transform cam = ctx.PlayerCamera != null ? ctx.PlayerCamera.transform : null;
+        Vector3 screenCenter = target.transform.position + Vector3.up * 0.535f;
+        Vector3 front = target.transform.forward;
+        Vector3 endPos = screenCenter + front * 0.36f;
+
+        if (cam != null)
+        {
+            Vector3 startPos = cam.position;
+            Quaternion startRot = cam.rotation;
+            Quaternion endRot = Quaternion.LookRotation(-front, Vector3.up);
+            const float duration = 1.2f;
+            float t = 0f;
+
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                float k = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / duration));
+                cam.position = Vector3.Lerp(startPos, endPos, k);
+                cam.rotation = Quaternion.Slerp(startRot, endRot, k);
+                yield return null;
+            }
+        }
+
+        yield return FlashWhite(0.3f);
+        yield return new WaitForSeconds(0.1f);
+
+        Log("loading Ending scene");
+        SceneManager.LoadScene("Ending");
+    }
+
+    private static IEnumerator FlashWhite(float duration)
+    {
+        GameObject go = new GameObject("ScreenFlash");
+        Canvas canvas = go.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 1000;
+        go.AddComponent<CanvasScaler>();
+
+        GameObject imgGo = new GameObject("White");
+        imgGo.transform.SetParent(go.transform, false);
+        Image img = imgGo.AddComponent<Image>();
+        img.color = new Color(1f, 1f, 1f, 0f);
+        RectTransform rt = img.rectTransform;
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+
+        float t = 0f;
+        while (t < duration)
+        {
+            t += Time.deltaTime;
+            img.color = new Color(1f, 1f, 1f, Mathf.Clamp01(t / duration));
+            yield return null;
+        }
+
+        img.color = Color.white;
+        Object.Destroy(go, 2f);
+    }
+
+    private static void SetControl(LevelContext ctx, bool enabled)
+    {
+        if (ctx.Player == null)
+        {
+            return;
+        }
+
+        foreach (Behaviour b in ctx.Player.GetComponentsInChildren<Behaviour>(true))
+        {
+            if (b == null)
+            {
+                continue;
+            }
+
+            string n = b.GetType().Name;
+            if (n == "MouseLook" || n == "PlayerMovement")
+            {
+                b.enabled = enabled;
+            }
         }
     }
 }

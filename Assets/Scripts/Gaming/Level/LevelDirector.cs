@@ -619,13 +619,70 @@ public class LevelDirector : MonoBehaviour
         }
     }
 
-    /// <summary>Runner 可以临时改目标文案（例如 "PRESS E — TAKE KEY"）。</summary>
+    /// <summary>Runner 可以临时改目标文案（例如 "PRESS E — TAKE KEY"）。带淡入淡出。</summary>
     public void SetObjective(string text)
     {
-        if (objectiveText != null && !string.IsNullOrEmpty(text))
+        if (objectiveText == null || string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        if (objectiveText.text == text)
+        {
+            return;
+        }
+
+        if (!isActiveAndEnabled)
         {
             objectiveText.text = text;
+            return;
         }
+
+        StartCoroutine(FadeObjective(text));
+    }
+
+    private Coroutine objectiveRoutine;
+
+    private IEnumerator FadeObjective(string text)
+    {
+        if (objectiveRoutine != null)
+        {
+            StopCoroutine(objectiveRoutine);
+        }
+
+        objectiveRoutine = StartCoroutine(FadeObjectiveRoutine(text));
+        yield break;
+    }
+
+    private IEnumerator FadeObjectiveRoutine(string text)
+    {
+        Color c = objectiveText.color;
+        float startAlpha = c.a;
+        float t = 0f;
+        const float half = 0.14f;
+
+        while (t < half)
+        {
+            t += Time.unscaledDeltaTime;
+            c.a = Mathf.Lerp(startAlpha, 0f, Mathf.Clamp01(t / half));
+            objectiveText.color = c;
+            yield return null;
+        }
+
+        objectiveText.text = text;
+
+        t = 0f;
+        while (t < half)
+        {
+            t += Time.unscaledDeltaTime;
+            c.a = Mathf.Lerp(0f, 1f, Mathf.Clamp01(t / half));
+            objectiveText.color = c;
+            yield return null;
+        }
+
+        c.a = 1f;
+        objectiveText.color = c;
+        objectiveRoutine = null;
     }
 
     public void RestoreObjective()

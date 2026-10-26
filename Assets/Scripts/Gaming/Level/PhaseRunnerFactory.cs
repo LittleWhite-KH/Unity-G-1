@@ -21,6 +21,10 @@ public static class PhaseRunnerFactory
                 return new DoorRunner();
             case PhaseKind.Ending:
                 return new EndingRunner();
+            case PhaseKind.Submit:
+                return new SubmitRunner();
+            case PhaseKind.ScreenDoor:
+                return new ScreenDoorRunner();
             default:
                 Debug.LogWarning($"[Level] unknown phase kind {kind}, fallback to TriggerRunner");
                 return new TriggerRunner();
