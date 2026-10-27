@@ -41,15 +41,15 @@ MonoBehaviour:
     waitForMapCycle: 1
     sanAfterStable: 40
     fadeOutOnComplete: 0
-  - id: charge_tomb
+  - id: charge_vase
     kind: 1
     levelTitle: LEVEL 1
-    objective: FIND THE TOMB
+    objective: FIND THE VASE
     objectiveWhenNear: 
     targetIds:
-    - tomb
-    waypointId: tomb
-    mapNodeId: tomb
+    - vase
+    waypointId: vase
+    mapNodeId: vase
     markVisitedOnComplete: 1
     sanZeroDistance: 48
     sanFullDistance: 5
@@ -71,10 +71,10 @@ MonoBehaviour:
   - id: reveal_map
     kind: 2
     levelTitle: LEVEL 1
-    objective: OPEN THE MAP [M]  ·  SETTINGS [TAB]
+    objective: "OPEN THE MAP [M]  \xB7  SETTINGS [TAB]"
     objectiveWhenNear: 
     targetIds: []
-    waypointId: table
+    waypointId: terminal
     mapNodeId: 
     markVisitedOnComplete: 0
     sanZeroDistance: -1
@@ -94,15 +94,15 @@ MonoBehaviour:
     waitForMapCycle: 1
     sanAfterStable: 40
     fadeOutOnComplete: 0
-  - id: charge_table
+  - id: charge_terminal
     kind: 1
     levelTitle: LEVEL 1
-    objective: FIND THE TABLE
+    objective: FIND THE TERMINAL
     objectiveWhenNear: 
     targetIds:
-    - table
-    waypointId: table
-    mapNodeId: table
+    - terminal
+    waypointId: terminal
+    mapNodeId: terminal
     markVisitedOnComplete: 1
     sanZeroDistance: 54
     sanFullDistance: 5

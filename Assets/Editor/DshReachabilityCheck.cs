@@ -25,7 +25,7 @@ public static class DshReachabilityCheck
         new Vector3(33f, 0f, 9.65f),    // Mainframe/终点区
     };
 
-    static readonly string[] Names = { "spawn", "tomb", "table", "tv", "pc1", "pc2", "mainframe" };
+    static readonly string[] Names = { "spawn", "vase", "terminal", "tv", "pc1", "pc2", "mainframe" };
 
     [MenuItem("Tools/DSH/Diag/Reachability")]
     public static void Run()

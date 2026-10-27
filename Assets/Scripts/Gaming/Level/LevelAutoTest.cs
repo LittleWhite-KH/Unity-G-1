@@ -41,10 +41,10 @@ public class LevelAutoTest : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
 
         bool ok = false;
-        yield return WaitPhase("charge_tomb", 20f, v => ok = v);
+        yield return WaitPhase("charge_vase", 20f, v => ok = v);
         if (!ok) yield break;
 
-        Log("phase charge_tomb, teleport to tomb");
+        Log("phase charge_vase, teleport to vase");
         Teleport(new Vector3(-3f, 0.15f, 7.6f), new Vector3(-3f, 1.1f, 11.2f));
         yield return new WaitForSeconds(0.6f);
 
@@ -58,11 +58,11 @@ public class LevelAutoTest : MonoBehaviour
         map.Close();
         yield return new WaitForSeconds(0.5f);
 
-        yield return WaitPhase("charge_table", 15f, v => ok = v);
+        yield return WaitPhase("charge_terminal", 15f, v => ok = v);
         if (!ok) yield break;
 
-        Log("phase charge_table, teleport to table");
-        Teleport(new Vector3(21f, 0.15f, -6.5f), new Vector3(21f, 0.9f, -9f));
+        Log("phase charge_terminal, teleport to terminal");
+        Teleport(new Vector3(21f, 0.15f, -6.5f), new Vector3(21f, 0.9f, -11.3f));
         yield return new WaitForSeconds(0.6f);
 
         yield return WaitPhase("door_trigger", 15f, v => ok = v);

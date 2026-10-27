@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
@@ -33,7 +33,7 @@ public static class DshHealthCheck
         // ---- 2. 关键对象 ----
         sb.AppendLine("=== key objects ===");
         foreach (var n in new[] { "Player", "Main Camera", "MazeRoot", "Keys", "LevelDirector", "LevelFade",
-            "TV_Ending", "DoorQuad", "GT_Tomb", "GT_Table", "GT_Door", "Slot_Floppy", "Slot_Disc" })
+            "TV_Ending", "DoorQuad", "GT_Vase", "GT_Terminal", "Slot_Floppy", "Slot_Disc" })
         {
             var go = FindByName(all, n);
             if (go == null) { sb.AppendLine($"  {n}: NOT FOUND"); continue; }

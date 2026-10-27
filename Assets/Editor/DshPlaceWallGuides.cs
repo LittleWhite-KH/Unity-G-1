@@ -56,8 +56,8 @@ public static class DshPlaceWallGuides
 
         Create(new Spec
         {
-            name = "Guide_Tomb",
-            text = "THE TOMB",
+            name = "Guide_Vase",
+            text = "THE VASE",
             anchor = new Vector3(-3f, 2.05f, 12.85f),
             normal = new Vector3(0f, 0f, -1f),
             fontSize = 30f,
@@ -85,8 +85,8 @@ public static class DshPlaceWallGuides
 
         Create(new Spec
         {
-            name = "Guide_Table",
-            text = "THE TABLE",
+            name = "Guide_Terminal",
+            text = "THE TERMINAL",
             anchor = new Vector3(21f, 1.95f, -12.84f),
             normal = new Vector3(0f, 0f, 1f),
             fontSize = 28f,

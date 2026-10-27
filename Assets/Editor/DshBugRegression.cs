@@ -117,7 +117,9 @@ public static class DshBugRegression
         SessionState.SetString(Prefix + "PlayStart", previous != null ? AssetDatabase.GetAssetPath(previous) : "");
         SavePref("outdoor.finished");
         SavePref("dsh.flowprobe");
+        PlayerPrefs.DeleteKey("outdoor.finished");
         PlayerPrefs.SetInt("dsh.flowprobe", 0);
+        PlayerPrefs.Save();
         SessionState.SetBool(Armed, true);
         EditorSceneManager.playModeStartScene = AssetDatabase.LoadAssetAtPath<SceneAsset>("Assets/Scenes/Start.unity");
         EditorApplication.update -= Tick;
@@ -196,16 +198,18 @@ public static class DshBugRegression
                 if (t < 4) return;
                 Check(SceneManager.GetActiveScene().name == "Start", "Ordinary Start remains Start (no diagnostic hijack)");
                 Check(VisibleText("NewGame") && VisibleText("gamestart"), "Default TV prompt and SPACE instruction visible");
+                Check(GameObject.Find("Start_Props") == null || !GameObject.Find("Start_Props").activeInHierarchy,
+                    "Minimal title hides decorations before finishing");
                 Shot("01-start"); held = Key.Space; Next(); break;
             case 1:
                 if (t < 0.2) return;
                 held = Key.None;
-                if (director == null || Phase() != "charge_tomb") return;
+                if (director == null || Phase() != "charge_vase") return;
                 Check(true, "SPACE enters Gaming without prior click; intro completes");
-                PlaceNear("tomb", new Vector3(0, 0, -3)); Next(); break;
+                PlaceNear("vase", new Vector3(0, 0, -3)); Next(); break;
             case 2:
                 if (Phase() != "reveal_map" || t < 1.5) return;
-                Check(true, "Tomb charges and reaches map reveal");
+                Check(true, "Vase charges and reaches map reveal");
                 held = Key.M; Next(); break;
             case 3:
                 if (t < 0.6) return;
@@ -219,9 +223,9 @@ public static class DshBugRegression
             case 5:
                 if (t < 0.5) return;
                 held = Key.None;
-                if (Phase() != "charge_table") return;
+                if (Phase() != "charge_terminal") return;
                 Check(!map.IsOpen && portal.player.GetComponent<PlayerMovement>().enabled, "Map closes and restores movement");
-                PlaceNear("table", new Vector3(0, 0, 3)); Next(); break;
+                PlaceNear("terminal", new Vector3(0, 0, 3)); Next(); break;
             case 6:
                 if (Phase() != "tv_offline") return;
                 Check(true, "Table charges and reaches offline TV");
@@ -270,6 +274,10 @@ public static class DshBugRegression
                 Check(Vector3.Distance(portal.player.position, portal.exitAnchor.position) < 0.5f, "Screen removal teleports to white room");
                 Check(portal.player.GetComponent<PlayerMovement>().canMove && portal.player.GetComponent<PlayerMovement>().enabled, "Movement restored after cinematic");
                 Check(portal.player.GetComponent<MouseLook>().canControl, "Mouse look restored after cinematic");
+                Check(GameObject.Find("TV_DarkRoom") != null, "Dark room exists behind the end door");
+                GameObject doorPrompt = GameObject.Find("TV_EndDoorPrompt");
+                CanvasGroup promptGroup = doorPrompt != null ? doorPrompt.GetComponent<CanvasGroup>() : null;
+                Check(promptGroup != null && promptGroup.alpha > 0.1f, "End door prompt visible from the white room entry");
                 samplePosition = portal.player.position; held = Key.A; Next(); break;
             case 16:
                 if (t < 1.8) return;
@@ -280,23 +288,28 @@ public static class DshBugRegression
                 if (t < 0.3) return;
                 mouseDelta = Vector2.zero;
                 Check(Quaternion.Angle(sampleRotation, portal.player.rotation) > 1, "Mouse input turns player in white room");
-                Teleport(portal.exitAnchor.position + Vector3.up * 0.1f, portal.doorOpening.position);
-                held = Key.W; Next(); break;
+                Teleport(new Vector3(0f, 0.1f, -203.4f), portal.doorOpening.position);
+                held = Key.E; Next(); break;
             case 18:
-                if (SceneManager.GetActiveScene().name != "Start") return;
+                if (SceneManager.GetActiveScene().name != "Start")
+                {
+                    if (t > 9) Check(false, "Pressing E at the end door did not lead back to Start");
+                    return;
+                }
                 held = Key.None;
-                Check(PlayerPrefs.GetInt("outdoor.finished") == 1, "Walking into black door writes finish flag and returns Start");
+                Check(PlayerPrefs.GetInt("outdoor.finished") == 1, "End door push animation writes finish flag and returns Start");
                 Next(); break;
             case 19:
                 if (t < 4) return;
                 Check(SceneManager.GetActiveScene().name == "Start", "Returned title stays Start");
                 Check(Object.FindAnyObjectByType<SettingsPanel>() == null && Cursor.lockState == CursorLockMode.None, "Old settings panel removed and title cursor unlocked");
-                Check(GameObject.Find("Start_Props") != null && VisibleText("gamestart"), "Title decorations and prompt visible after completion");
+                Check(GameObject.Find("Start_Props") != null && GameObject.Find("Start_Props").activeInHierarchy && VisibleText("gamestart"),
+                    "Title decorations and prompt revealed after completing the game");
                 Shot("05-completed-title"); held = Key.Space; Next(); break;
             case 20:
                 if (t < 0.2) return;
                 held = Key.None;
-                if (director == null || Phase() != "charge_tomb") return;
+                if (director == null || Phase() != "charge_vase") return;
                 SettingsPanel settings = Object.FindAnyObjectByType<SettingsPanel>();
                 Check(settings != null, "Second game creates fresh settings panel");
                 settings.SetOpen(true);
@@ -359,12 +372,24 @@ public static class DshBugRegression
     static void CapturePortal(TvPortal portal)
     {
         var rt = portal.portalCamera.targetTexture;
+        File.AppendAllText(Path.Combine(Output, "results.txt"),
+            $"PORTALCAM pos={portal.portalCamera.transform.position} rot={portal.portalCamera.transform.eulerAngles} fov={portal.portalCamera.fieldOfView} mask=0x{portal.portalCamera.cullingMask:X} rt={rt.width}x{rt.height}\n");
+        GameObject leaf = GameObject.Find("Plane.001");
+        if (leaf != null)
+        {
+            var leafRenderer = leaf.GetComponent<Renderer>();
+            if (leafRenderer != null)
+            {
+                File.AppendAllText(Path.Combine(Output, "results.txt"),
+                    $"LEAF bounds={leafRenderer.bounds.center} size={leafRenderer.bounds.size}\n");
+            }
+        }
         var old = RenderTexture.active; RenderTexture.active = rt;
         var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
         tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0); tex.Apply(); RenderTexture.active = old;
         Color32[] pixels = tex.GetPixels32();
         Check(pixels.Count(c => c.r > 160 && c.g > 160 && c.b > 160) > pixels.Length / 2, "Portal RT shows bright white world");
-        Check(pixels.Count(c => c.r < 30 && c.g < 30 && c.b < 30) > pixels.Length / 100, "Portal RT contains black doorway");
+        Check(pixels.Count(c => c.r < 60 && c.g < 60 && c.b < 60) > pixels.Length / 50, "Portal RT contains the dark doorway");
         File.WriteAllBytes(Path.Combine(Output, "portal-rt.png"), tex.EncodeToPNG()); Object.Destroy(tex);
     }
     static void Shot(string name) { ScreenCapture.CaptureScreenshot(Path.Combine(Output, name + ".png")); }

@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
@@ -22,6 +23,7 @@ public class TvPortal : MonoBehaviour
     public Renderer glassSurface;
     public Camera portalCamera;
     public Shader portalShader;
+    public Material portalMaterial;
     public Transform destinationPortal;
 
     [Header("Params")]
@@ -38,6 +40,9 @@ public class TvPortal : MonoBehaviour
     [Header("Ending")]
     public string endSceneName = "Start";
     public string finishPrefKey = "outdoor.finished";
+
+    [Tooltip("When true the door waits for the player to press E (EndDoor); no auto-trigger.")]
+    public bool waitForDoorInteraction = true;
 
     private RenderTexture rt;
     private Material portalMat;
@@ -80,6 +85,14 @@ public class TvPortal : MonoBehaviour
 
         if (!finished)
         {
+            // The white world hides the HUD, so ESC is the only way out if the player gets stuck.
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                Debug.Log("[TvPortal] ESC pressed in the white world, returning to Start without finishing");
+                SceneManager.LoadScene(endSceneName);
+                return;
+            }
+
             UpdateWhiteRoom();
         }
     }
@@ -127,12 +140,21 @@ public class TvPortal : MonoBehaviour
         EnsureRenderTexture();
         portalCamera.projectionMatrix = playerCamera.projectionMatrix;
 
+        // Curved portal surfaces sample the RT with a projection from the portal camera.
+        Shader.SetGlobalMatrix("_PortalVP", portalCamera.projectionMatrix * portalCamera.worldToCameraMatrix);
+
+        // The portal view is a clean window: keep SAN distortion out of the RT.
+        float savedGlitch = Shader.GetGlobalFloat("_SanGlitch");
+        Shader.SetGlobalFloat("_SanGlitch", 0f);
+
         if (GraphicsSettings.currentRenderPipeline == null) portalCamera.Render();
         else
         {
             var request = new UniversalRenderPipeline.SingleCameraRequest { destination = rt };
             RenderPipeline.SubmitRenderRequest(portalCamera, request);
         }
+
+        Shader.SetGlobalFloat("_SanGlitch", savedGlitch);
     }
 
     // ------------------------------------------------------------------
@@ -237,6 +259,12 @@ public class TvPortal : MonoBehaviour
             move.enabled = true;
             move.canMove = true;
         }
+
+        // The white world is the "clear" reality: no SAN distortion there.
+        SanGlitchController glitch = Object.FindAnyObjectByType<SanGlitchController>();
+        if (glitch != null) glitch.enabled = false;
+        Shader.SetGlobalFloat("_SanGlitch", 0f);
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -260,7 +288,8 @@ public class TvPortal : MonoBehaviour
         foreach (Canvas canvas in Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None))
         {
             if (canvas == null) continue;
-            if (flash != null && canvas.transform == flash.transform) continue;
+            // Keep portal feedback layers (flash, door prompt): they are prefixed with TV_.
+            if (canvas.name.StartsWith("TV_")) continue;
             canvas.gameObject.SetActive(false);
         }
     }
@@ -269,14 +298,24 @@ public class TvPortal : MonoBehaviour
     {
         if (doorOpening == null) return;
 
+        // With EndDoor in the scene the ending is triggered by pressing E at the door.
+        if (waitForDoorInteraction) return;
+
         float dx = player.position.x - doorOpening.position.x;
         float dz = player.position.z - doorOpening.position.z;
         float d = Mathf.Sqrt(dx * dx + dz * dz);
         if (d <= doorTriggerDistance)
         {
-            finished = true;
-            StartCoroutine(EndRoutine());
+            TriggerEnding();
         }
+    }
+
+    /// <summary>EndDoor calls this after its push animation.</summary>
+    public void TriggerEnding()
+    {
+        if (finished) return;
+        finished = true;
+        StartCoroutine(EndRoutine());
     }
 
     private IEnumerator EndRoutine()
@@ -312,12 +351,25 @@ public class TvPortal : MonoBehaviour
     {
         if (portalSurface == null || portalCamera == null) return;
 
-        Shader shader = portalShader != null ? portalShader : Shader.Find("DSH/TvPortal");
-        if (shader != null)
+        // Prefer the explicit material asset (curved shader), then fall back by shader name.
+        if (portalMaterial != null)
         {
-            portalMat = new Material(shader);
+            portalMat = new Material(portalMaterial);
+        }
+        else
+        {
+            Shader shader = Shader.Find("DSH/TvPortalCurved");
+            if (shader == null) shader = portalShader != null ? portalShader : Shader.Find("DSH/TvPortal");
+            if (shader != null) portalMat = new Material(shader);
+        }
+
+        if (portalMat != null)
+        {
             portalMat.name = "TV_PortalMat";
             portalMat.SetTexture("_MainTex", rt);
+            // Material assets can lose their color defaults when the shader is swapped.
+            if (portalMat.HasProperty("_Tint")) portalMat.SetColor("_Tint", Color.white);
+            if (portalMat.HasProperty("_Glow")) portalMat.SetFloat("_Glow", 0.02f);
             portalSurface.sharedMaterial = portalMat;
         }
 

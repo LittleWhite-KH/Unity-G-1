@@ -1,4 +1,4 @@
-﻿//
+//
 //  Outline.cs
 //  QuickOutline
 //
@@ -169,6 +169,11 @@ public class Outline : MonoBehaviour {
         continue;
       }
 
+      // Meshes imported without Read/Write cannot be read back; skip them instead of throwing.
+      if (meshFilter.sharedMesh == null || !meshFilter.sharedMesh.isReadable) {
+        continue;
+      }
+
       // Serialize smooth normals
       var smoothNormals = SmoothNormals(meshFilter.sharedMesh);
 
@@ -184,6 +189,11 @@ public class Outline : MonoBehaviour {
 
       // Skip if smooth normals have already been adopted
       if (!registeredMeshes.Add(meshFilter.sharedMesh)) {
+        continue;
+      }
+
+      // Meshes imported without Read/Write cannot be modified; skip them.
+      if (meshFilter.sharedMesh == null || !meshFilter.sharedMesh.isReadable) {
         continue;
       }
 

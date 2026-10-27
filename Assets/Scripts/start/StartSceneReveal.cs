@@ -1,20 +1,24 @@
 using UnityEngine;
 
 /// <summary>
-/// Start（标题/结束）场景：
-///   · 保持你在场景里摆好的画面：电视机 + 装饰 + 屏幕文字；
-///   · forceShow=true（默认）时装饰常显；把它关掉才会按通关标记隐藏装饰。
+/// Start（标题/结束）场景的显隐：
+///   · 未通关：只保留电视机、屏幕上的 TMP 文字和必要的光/相机，其余全部隐藏（极简开场）；
+///   · 通关后（PlayerPrefs 里有 finishPrefKey）：装饰与背景全部显现。
+/// forceShow=true 时强制全显，方便在编辑器里布置场景。
 /// </summary>
 [DisallowMultipleComponent]
 public class StartSceneReveal : MonoBehaviour
 {
-    [Tooltip("电视周围的装饰根物体（Start_Props）")]
+    [Tooltip("电视周围的装饰根物体（Start_Props），未通关时隐藏")]
     public GameObject props;
+
+    [Tooltip("除装饰外还需要在未通关时隐藏的对象（例如背景 3Dobj：地板/背板）")]
+    public GameObject[] hideWhenNotFinished = new GameObject[0];
 
     public string finishPrefKey = "outdoor.finished";
 
-    [Tooltip("true = 装饰常显（保持当前 Start 画面）；false = 未通关时隐藏装饰")]
-    public bool forceShow = true;
+    [Tooltip("true = 强制全部显示（编辑/调试用）；false = 按通关标记切换")]
+    public bool forceShow = false;
 
     private void Awake()
     {
@@ -29,6 +33,14 @@ public class StartSceneReveal : MonoBehaviour
         if (props != null)
         {
             props.SetActive(finished);
+        }
+
+        if (hideWhenNotFinished != null)
+        {
+            for (int i = 0; i < hideWhenNotFinished.Length; i++)
+            {
+                if (hideWhenNotFinished[i] != null) hideWhenNotFinished[i].SetActive(finished);
+            }
         }
 
         Debug.Log($"[StartSceneReveal] forceShow={forceShow} finished={finished} props={(props != null ? props.name : "null")}");
